@@ -51,10 +51,10 @@ namespace stypox {
 		using TextArg  = Argument<TextType>;
 
 	private:
-		const std::vector<BoolArg>  boolArgs;
-		const std::vector<IntArg>   intArgs;
-		const std::vector<FloatArg> floatArgs;
-		const std::vector<TextArg>  textArgs;
+		const std::vector<BoolArg>  m_boolArgs;
+		const std::vector<IntArg>   m_intArgs;
+		const std::vector<FloatArg> m_floatArgs;
+		const std::vector<TextArg>  m_textArgs;
 
 	public:
 		BasicArgParser(const std::vector<BoolArg>&  boolArgs,
