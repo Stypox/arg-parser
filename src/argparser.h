@@ -34,9 +34,12 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType,
 		class = typename std::enable_if_t<
 			std::is_integral_v<IntType> &&
-			std::is_floating_point_v<FloatType> &&
-			std::is_convertible_v<const char*, TextType> ||
-			std::is_constructible_v<TextType, const char *>>>
+			std::is_floating_point_v<FloatType> && (
+				std::is_convertible_v<const char*, TextType> ||
+				std::is_constructible_v<TextType, const char *>
+			)
+		>
+	>
 	class BasicArgParser {
 	public:
 		using BoolArg  = Argument<bool>;
