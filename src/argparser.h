@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <string>
+#include <optional>
+#include <functional>
 
 
 namespace stypox {
@@ -15,14 +17,31 @@ namespace stypox {
 	class BasicArgParser {
 		template <class T>
 		class Argument {
+		public:
 			using value_type = T;
+		private:
+			std::string m_name;
+			std::string m_description;
 
-			std::string argName;
-			std::vector<std::string> paramNames;
-			std::string description;
+			std::vector<std::string> m_parameters;
+			std::optional<std::function<bool(T)>> m_validityChecker;
+			bool m_required;
 
-			bool required;
-			T value;
+			T m_value;
+
+		public:
+			Argument(const std::string& name,
+					 const std::string& description,
+					 const std::vector<std::string>& parameters,
+					 bool required = false,
+					 T defaultValue = {});
+			
+			Argument(const std::string& name,
+					 const std::string& description,
+					 const std::vector<std::string>& parameters,
+					 std::function<bool(std::enable_if_t<!std::is_same_v<T, bool>,T>)> validityChecker,
+					 bool required = false,
+					 T defaultValue = {});
 		};
 
 	public:
