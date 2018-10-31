@@ -1,0 +1,8 @@
+.vscode/
+
+*.exe
+*.o
+
+GPATH
+GTAGS
+GRTAGS
