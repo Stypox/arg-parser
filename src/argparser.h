@@ -71,6 +71,17 @@ namespace stypox {
 	};
 
 	using ArgParser = BasicArgParser<int, float, std::string>;
+
+
+	template <class IntType, class FloatType, class TextType, class Enable>
+	BasicArgParser<IntType, FloatType, TextType, Enable>::
+	BasicArgParser(
+		const std::vector<BoolArg>&  boolArgs,
+		const std::vector<IntArg>&   intArgs,
+		const std::vector<FloatArg>& floatArgs,
+		const std::vector<TextArg>&  textArgs) :
+		m_boolArgs{boolArgs}, m_intArgs{intArgs},
+		m_floatArgs{floatArgs}, m_textArgs{textArgs} {}
 }
 
 #endif
