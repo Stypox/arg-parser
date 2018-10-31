@@ -24,17 +24,11 @@ namespace stypox {
 
 	public:
 		Argument(const std::string& name,
-					const std::string& description,
-					const std::vector<std::string>& parameters,
-					bool required = false,
-					T defaultValue = {});
-		
-		Argument(const std::string& name,
-					const std::string& description,
-					const std::vector<std::string>& parameters,
-					std::function<bool(std::enable_if_t<!std::is_same_v<T, bool>,T>)> validityChecker,
-					bool required = false,
-					T defaultValue = {});
+				 const std::string& description,
+				 const std::vector<std::string>& parameters,
+				 const std::function<bool(T)>& validityChecker = [](T){ return true; },
+				 T defaultValue = {},
+				 bool required = false);
 	};
 
 	template <class IntType, class FloatType, class TextType,
@@ -71,6 +65,20 @@ namespace stypox {
 	};
 
 	using ArgParser = BasicArgParser<int, float, std::string>;
+		
+	
+	template <class T>
+	Argument<T>::
+	Argument(
+		const std::string& name,
+		const std::string& description,
+		const std::vector<std::string>& parameters,
+		const std::function<bool(T)>& validityChecker,
+		T defaultValue,
+		bool required) :
+		m_name{name}, m_description{description},
+		m_parameters{parameters}, m_validityChecker{validityChecker},
+		m_required{required}, m_value{defaultValue} {}
 
 
 	template <class IntType, class FloatType, class TextType, class Enable>
