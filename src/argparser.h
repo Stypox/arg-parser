@@ -60,6 +60,9 @@ namespace stypox {
 
 		std::string m_programName;
 
+		template<class T>
+		static bool findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg);
+
 	public:
 		BasicArgParser(const std::vector<BoolArg>&  boolArgs,
 					   const std::vector<IntArg>&   intArgs,
@@ -146,6 +149,18 @@ namespace stypox {
 		return m_value;
 	}
 
+	template <class IntType, class FloatType, class TextType, class Enable>
+	template <class T>
+	bool BasicArgParser<IntType, FloatType, TextType, Enable>::
+	findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg) {
+		if (auto found = std::find(typeArgs.begin(), typeArgs.end(), arg); found == typeArgs.end()) {
+			return false;
+		}
+		else {
+			(*found) = arg;
+			return true;
+		}
+	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
 	BasicArgParser<IntType, FloatType, TextType, Enable>::
@@ -163,15 +178,10 @@ namespace stypox {
 		m_programName = argv[0];
 		for (int argIt = 1; argIt < argc; ++argIt) {
 			std::string_view arg{argv[argIt]};
-			if (auto found = std::find(m_boolArgs.begin(), m_boolArgs.end(), arg); found != m_boolArgs.end())
-				(*found) = arg;
-			else if (auto found = std::find(m_intArgs.begin(), m_intArgs.end(), arg); found != m_intArgs.end())
-				(*found) = arg;
-			else if (auto found = std::find(m_floatArgs.begin(), m_floatArgs.end(), arg); found != m_floatArgs.end())
-				(*found) = arg;
-			else if (auto found = std::find(m_textArgs.begin(), m_textArgs.end(), arg); found != m_textArgs.end())
-				(*found) = arg;
-			else
+			if (!(findAssign(m_boolArgs, arg) ||
+				  findAssign(m_intArgs, arg) ||
+				  findAssign(m_floatArgs, arg) ||
+				  findAssign(m_textArgs, arg)))
 				throw std::runtime_error("Unknown argument: " + std::string{arg});
 		}
 	}
