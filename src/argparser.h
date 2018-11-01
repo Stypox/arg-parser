@@ -60,8 +60,11 @@ namespace stypox {
 
 		std::string m_programName;
 
-		template<class T>
+		template <class T>
 		static bool findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg);
+
+		template <class T>
+		static T get(std::vector<Argument<T>>& typeArgs, const std::string& name);
 
 	public:
 		BasicArgParser(const std::vector<BoolArg>&  boolArgs,
@@ -71,10 +74,10 @@ namespace stypox {
 
 		void parse(int argc, char const* argv[]);
 
-		bool      getBool(const std::string& name);
-		IntType   getInt(const std::string& name);
-		FloatType getFloat(const std::string& name);
-		TextType  getText(const std::string& name);
+		inline bool      getBool(const std::string& name);
+		inline IntType   getInt(const std::string& name);
+		inline FloatType getFloat(const std::string& name);
+		inline TextType  getText(const std::string& name);
 	};
 
 	using ArgParser = BasicArgParser<int, float, std::string>;
@@ -163,6 +166,25 @@ namespace stypox {
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
+	template <class T>
+	T BasicArgParser<IntType, FloatType, TextType, Enable>::
+	get(std::vector<Argument<T>>& typeArgs, const std::string& name) {
+		for(auto&& arg : typeArgs) {
+			if (arg.name() == name)
+				return arg.value();
+		}
+
+		if constexpr(std::is_same_v<bool, T>)
+			throw std::out_of_range("stypox::BasicArgParser::getBool(): argument " + name + " not found");
+		else if constexpr(std::is_same_v<IntType, T>)
+			throw std::out_of_range("stypox::BasicArgParser::getInt(): argument " + name + " not found");
+		else if constexpr(std::is_same_v<FloatType, T>)
+			throw std::out_of_range("stypox::BasicArgParser::getFloat(): argument " + name + " not found");
+		else
+			throw std::out_of_range("stypox::BasicArgParser::getText(): argument " + name + " not found");
+	}
+
+	template <class IntType, class FloatType, class TextType, class Enable>
 	BasicArgParser<IntType, FloatType, TextType, Enable>::
 	BasicArgParser(
 		const std::vector<BoolArg>&  boolArgs,
@@ -189,38 +211,22 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	bool BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getBool(const std::string& name) {
-		for(auto&& arg : m_boolArgs) {
-			if (arg.name() == name)
-				return arg.value();
-		}
-		throw std::out_of_range("stypox::BasicArgParser::getBool(): argument " + name + " not found");
+		return get(m_floatArgs, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	IntType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getInt(const std::string& name) {
-		for(auto&& arg : m_intArgs) {
-			if (arg.name() == name)
-				return arg.value();
-		}
-		throw std::out_of_range("stypox::BasicArgParser::getInt(): argument " + name + " not found");
+		return get(m_floatArgs, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	FloatType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getFloat(const std::string& name) {
-		for(auto&& arg : m_floatArgs) {
-			if (arg.name() == name)
-				return arg.value();
-		}
-		throw std::out_of_range("stypox::BasicArgParser::getFloat(): argument " + name + " not found");
+		return get(m_floatArgs, name);
 	}
 	template <class IntType, class FloatType, class TextType, class Enable>
 	TextType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getText(const std::string& name) {
-		for(auto&& arg : m_textArgs) {
-			if (arg.name() == name)
-				return arg.value();
-		}
-		throw std::out_of_range("stypox::BasicArgParser::getInt(): argument " + name + " not found");
+		return get(m_floatArgs, name);
 	}
 }
 
