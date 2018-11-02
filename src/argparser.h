@@ -346,19 +346,20 @@ namespace stypox {
 		result.append(" [OPTIONS...]\n\n");
 
 		if (!m_boolArgs.empty()) {
-			result.append("Switchable options:\n");
+			result.append("\nSwitchable options:\n");
 			for (auto&& boolArg : m_boolArgs)
 				result.append(boolArg.help(m_descriptionIndentation));
-			result += '\n';
 		}
 
-		result.append("Value options (I=integer, D=decimal, T=text):\n");
-		for (auto&& intArg : m_intArgs)
-			result.append(intArg.help(m_descriptionIndentation));
-		for (auto&& floatArg : m_floatArgs)
-			result.append(floatArg.help(m_descriptionIndentation));
-		for (auto&& textArg : m_textArgs)
-			result.append(textArg.help(m_descriptionIndentation));
+		if (!m_intArgs.empty() && !m_floatArgs.empty() && !m_textArgs.empty()) {
+			result.append("\nValue options (I=integer, D=decimal, T=text):\n");
+			for (auto&& intArg : m_intArgs)
+				result.append(intArg.help(m_descriptionIndentation));
+			for (auto&& floatArg : m_floatArgs)
+				result.append(floatArg.help(m_descriptionIndentation));
+			for (auto&& textArg : m_textArgs)
+				result.append(textArg.help(m_descriptionIndentation));
+		}
 		
 		return result;
 	}
