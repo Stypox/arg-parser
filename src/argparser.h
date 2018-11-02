@@ -36,6 +36,8 @@ namespace stypox {
 
 		std::string name();
 		T value();
+
+		std::string help();
 	};
 
 	template <class IntType, class FloatType, class TextType,
@@ -59,6 +61,7 @@ namespace stypox {
 		std::vector<TextArg>  m_textArgs;
 
 		std::string m_programName;
+		std::string_view m_executablePath;
 
 		template <class T>
 		static bool findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg);
@@ -67,7 +70,8 @@ namespace stypox {
 		static T get(std::vector<Argument<T>>& typeArgs, const std::string& name);
 
 	public:
-		BasicArgParser(const std::vector<BoolArg>&  boolArgs,
+		BasicArgParser(const std::string& programName,
+					   const std::vector<BoolArg>&  boolArgs,
 					   const std::vector<IntArg>&   intArgs,
 					   const std::vector<FloatArg>& floatArgs,
 					   const std::vector<TextArg>&  textArgs);
@@ -78,6 +82,8 @@ namespace stypox {
 		inline IntType   getInt(const std::string& name);
 		inline FloatType getFloat(const std::string& name);
 		inline TextType  getText(const std::string& name);
+
+		std::string help();
 	};
 
 	using ArgParser = BasicArgParser<int, float, std::string>;
@@ -152,6 +158,36 @@ namespace stypox {
 		return m_value;
 	}
 
+	template <class T>
+	std::string Argument<T>::
+	help() {
+		constexpr size_t indentSize = 25; // spaces
+
+		std::string result = "  ";
+		for (auto&& param : m_parameters) {
+			result.append(param);
+			if constexpr(!std::is_same_v<bool, T>) {
+				if constexpr (std::is_integral_v<T>)
+					result += 'I'; // integer
+				else if constexpr (std::is_floating_point_v<T>)
+					result += 'D'; // decimal floating point
+				else
+					result += 'T'; // text
+			}
+			result += ' ';
+		}
+
+		if (result.size() < indentSize)
+			result.append(std::string(indentSize - result.size(), ' '));
+		
+		result.append(m_description);
+		result += '\n';
+		
+		return result;
+	}
+
+
+
 	template <class IntType, class FloatType, class TextType, class Enable>
 	template <class T>
 	bool BasicArgParser<IntType, FloatType, TextType, Enable>::
@@ -187,17 +223,19 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	BasicArgParser<IntType, FloatType, TextType, Enable>::
 	BasicArgParser(
+		const std::string& programName,
 		const std::vector<BoolArg>&  boolArgs,
 		const std::vector<IntArg>&   intArgs,
 		const std::vector<FloatArg>& floatArgs,
 		const std::vector<TextArg>&  textArgs) :
 		m_boolArgs{boolArgs}, m_intArgs{intArgs},
-		m_floatArgs{floatArgs}, m_textArgs{textArgs} {}
+		m_floatArgs{floatArgs}, m_textArgs{textArgs},
+		m_programName{programName} {}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
 	void BasicArgParser<IntType, FloatType, TextType, Enable>::
 	parse(int argc, char const* argv[]) {
-		m_programName = argv[0];
+		m_executablePath = argv[0];
 		for (int argIt = 1; argIt < argc; ++argIt) {
 			std::string_view arg{argv[argIt]};
 			if (!(findAssign(m_boolArgs, arg) ||
@@ -227,6 +265,32 @@ namespace stypox {
 	TextType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getText(const std::string& name) {
 		return get(m_floatArgs, name);
+	}
+
+	template <class IntType, class FloatType, class TextType, class Enable>
+	std::string BasicArgParser<IntType, FloatType, TextType, Enable>::
+	help() {
+		std::string result = m_programName;
+		result.append(": Help screen\n\nUsage: ");
+		result.append(m_executablePath);
+		result.append(" [OPTIONS...]\n\n");
+
+		if (!m_boolArgs.empty()) {
+			result.append("Switchable options:\n");
+			for (auto&& boolArg : m_boolArgs)
+				result.append(boolArg.help());
+			result += '\n';
+		}
+
+		result.append("Value options (I=integer, D=decimal, T=text):\n");
+		for (auto&& intArg : m_intArgs)
+			result.append(intArg.help());
+		for (auto&& floatArg : m_floatArgs)
+			result.append(floatArg.help());
+		for (auto&& textArg : m_textArgs)
+			result.append(textArg.help());
+		
+		return result;
 	}
 }
 
