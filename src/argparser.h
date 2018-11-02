@@ -124,7 +124,7 @@ namespace stypox {
 		if constexpr(std::is_same_v<bool, T>) {
 			m_value = true;
 			if (!m_validityChecker(m_value))
-				throw std::runtime_error("Argument \"" + m_name + "\": invalid value \"" + (m_value ? "true" : "false") + "\": " + std::string{arg});
+				throw std::runtime_error("Argument \"" + m_name + "\": value " + (m_value ? "true" : "false") + " is not allowed: " + std::string{arg});
 		}
 		else {
 			std::string argValue;
@@ -165,7 +165,7 @@ namespace stypox {
 			}
 			
 			if (!m_validityChecker(m_value))
-				throw std::runtime_error("Argument \"" + m_name + "\": value \"" + argValue + "\" is not allowed: " + std::string{arg});
+				throw std::runtime_error("Argument \"" + m_name + "\": value " + argValue + " is not allowed: " + std::string{arg});
 		}
 	}
 
