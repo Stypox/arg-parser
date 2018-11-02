@@ -140,12 +140,31 @@ namespace stypox {
 				throw std::runtime_error("Argument \"" + m_name + "\" requires a value: " + std::string{arg});
 			
 
-			if constexpr(std::is_integral_v<T>)
-				m_value = std::stoll(argValue);
-			else if constexpr(std::is_floating_point_v<T>)
-				m_value = std::stold(argValue);
-			else
+			if constexpr(std::is_integral_v<T>) {
+				try {
+					size_t usedCharacters;
+					m_value = std::stoll(argValue, &usedCharacters);
+					if (usedCharacters != argValue.size())
+						throw std::invalid_argument("");
+				}
+				catch (std::invalid_argument&) {
+					throw std::runtime_error("Argument \"" + m_name + "\": \"" + argValue + "\" is not an integer: " + std::string{arg});
+				}
+			}
+			else if constexpr(std::is_floating_point_v<T>) {
+				try {
+					size_t usedCharacters;
+					m_value = std::stold(argValue, &usedCharacters);
+					if (usedCharacters != argValue.size())
+						throw std::invalid_argument("");
+				}
+				catch (std::invalid_argument&) {
+					throw std::runtime_error("Argument \"" + m_name + "\": \"" + argValue + "\" is not a decimal: " + std::string{arg});
+				}
+			}
+			else {
 				m_value = argValue;
+			}
 			
 			if (!m_validityChecker(m_value))
 				throw std::runtime_error("Argument \"" + m_name + "\": invalid value \"" + argValue + "\": " + std::string{arg});
