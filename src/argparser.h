@@ -61,7 +61,7 @@ namespace stypox {
 		std::vector<TextArg>  m_textArgs;
 
 		const std::string m_programName;
-		std::string_view m_executablePath;
+		std::optional<std::string_view> m_executablePath;
 
 		size_t m_descriptionIndentation;
 
@@ -80,6 +80,7 @@ namespace stypox {
 					   const std::vector<IntArg>&   intArgs,
 					   const std::vector<FloatArg>& floatArgs,
 					   const std::vector<TextArg>&  textArgs,
+					   bool firstArgumentIsExecutablePath = true,
 					   size_t descriptionIndentation = 25);
 
 		void parse(int argc, char const* argv[]);
@@ -288,16 +289,22 @@ namespace stypox {
 		const std::vector<IntArg>&   intArgs,
 		const std::vector<FloatArg>& floatArgs,
 		const std::vector<TextArg>&  textArgs,
+		bool firstArgumentIsExecutablePath,
 		size_t descriptionIndentation) :
 		m_boolArgs{boolArgs}, m_intArgs{intArgs},
 		m_floatArgs{floatArgs}, m_textArgs{textArgs},
-		m_programName{programName}, m_descriptionIndentation{descriptionIndentation} {}
+		m_programName{programName}, m_executablePath{firstArgumentIsExecutablePath ? std::optional<std::string_view>{""} : std::optional<std::string_view>{}},
+		m_descriptionIndentation{descriptionIndentation} {}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
 	void BasicArgParser<IntType, FloatType, TextType, Enable>::
 	parse(int argc, char const* argv[]) {
-		m_executablePath = argv[0];
-		for (int argIt = 1; argIt < argc; ++argIt) {
+		if (m_executablePath.has_value()) { // if the first argument has to be used as executable path
+			if (argc < 1)
+				throw std::out_of_range("stypox::BasicArgParser::parse(): too few items");
+			m_executablePath = argv[0];
+		}
+		for (int argIt = m_executablePath.has_value(); argIt < argc; ++argIt) {
 			std::string_view arg{argv[argIt]};
 			if (!(findAssign(m_boolArgs, arg) ||
 				  findAssign(m_intArgs, arg) ||
@@ -342,8 +349,13 @@ namespace stypox {
 	help() const {
 		std::string result = m_programName;
 		result.append(": Help screen\n\nUsage: ");
-		result.append(m_executablePath);
-		result.append(" [OPTIONS...]\n\n");
+		if (m_executablePath.has_value()) {
+			result.append(*m_executablePath);
+			result.append(" [OPTIONS...]\n");
+		}
+		else {
+			result.append("[OPTIONS...]\n");
+		}
 
 		if (!m_boolArgs.empty()) {
 			result.append("\nSwitchable options:\n");
