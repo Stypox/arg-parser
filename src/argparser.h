@@ -27,9 +27,9 @@ namespace stypox {
 		Argument(const std::string& name,
 				 const std::string& description,
 				 const std::vector<std::string>& parameters,
-				 const std::function<bool(T)>& validityChecker = [](T){ return true; },
+				 bool required = false,
 				 T defaultValue = {},
-				 bool required = false);
+				 const std::function<bool(T)>& validityChecker = [](T){ return true; });
 		
 		bool operator== (const std::string_view& arg);
 		void operator= (const std::string_view& arg);
@@ -95,9 +95,9 @@ namespace stypox {
 		const std::string& name,
 		const std::string& description,
 		const std::vector<std::string>& parameters,
-		const std::function<bool(T)>& validityChecker,
+		bool required,
 		T defaultValue,
-		bool required) :
+		const std::function<bool(T)>& validityChecker) :
 		m_name{name}, m_description{description},
 		m_parameters{parameters}, m_validityChecker{validityChecker},
 		m_required{required}, m_value{defaultValue} {}
