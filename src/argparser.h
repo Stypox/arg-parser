@@ -9,14 +9,14 @@
 
 namespace stypox {
 	template <class T>
-	class Argument {
+	class Option {
 	public:
 		using value_type = T;
 	private:
 		const std::string m_name;
 		const std::string m_description;
 
-		const std::vector<std::string> m_parameters;
+		const std::vector<std::string> m_arguments;
 		const std::function<bool(T)> m_validityChecker;
 		const bool m_required;
 
@@ -24,9 +24,9 @@ namespace stypox {
 		bool m_alreadySeen = false;
 
 	public:
-		Argument(const std::string& name,
+		Option(const std::string& name,
 				 const std::string& description,
-				 const std::vector<std::string>& parameters,
+				 const std::vector<std::string>& arguments,
 				 const std::optional<T>& defaultValue = {{}},
 				 const std::function<bool(T)>& validityChecker = [](T){ return true; });
 		
@@ -49,10 +49,10 @@ namespace stypox {
 	>
 	class BasicArgParser {
 	public:
-		using BoolArg  = Argument<bool>;
-		using IntArg   = Argument<IntType>;
-		using FloatArg = Argument<FloatType>;
-		using TextArg  = Argument<TextType>;
+		using BoolArg  = Option<bool>;
+		using IntArg   = Option<IntType>;
+		using FloatArg = Option<FloatType>;
+		using TextArg  = Option<TextType>;
 
 	private:
 		std::vector<BoolArg>  m_boolArgs;
@@ -66,13 +66,13 @@ namespace stypox {
 		size_t m_descriptionIndentation;
 
 		template <class T>
-		static bool findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg);
+		static bool findAssign(std::vector<Option<T>>& typeArgs, const std::string_view& arg);
 
 		template <class T>
-		static T get(const std::vector<Argument<T>>& typeArgs, const std::string& name);
+		static T get(const std::vector<Option<T>>& typeArgs, const std::string& name);
 
 		template <class T>
-		static void checkValidity(const std::vector<Argument<T>>& typeArgs);
+		static void checkValidity(const std::vector<Option<T>>& typeArgs);
 
 	public:
 		BasicArgParser(const std::string& programName,
@@ -98,36 +98,36 @@ namespace stypox {
 		
 	
 	template <class T>
-	Argument<T>::
-	Argument(
+	Option<T>::
+	Option(
 		const std::string& name,
 		const std::string& description,
-		const std::vector<std::string>& parameters,
+		const std::vector<std::string>& arguments,
 		const std::optional<T>& defaultValue,
 		const std::function<bool(T)>& validityChecker) :
 		m_name{name}, m_description{description},
-		m_parameters{parameters}, m_validityChecker{validityChecker},
+		m_arguments{arguments}, m_validityChecker{validityChecker},
 		m_required{!defaultValue.has_value()}, m_value{defaultValue.has_value() ? *defaultValue : T{}} {}
 	
 	template <class T>
-	bool Argument<T>::
+	bool Option<T>::
 	operator== (const std::string_view& arg) const {
 		if constexpr(std::is_same_v<T, bool>) {
-			return std::find(m_parameters.begin(), m_parameters.end(), arg) != m_parameters.end();
+			return std::find(m_arguments.begin(), m_arguments.end(), arg) != m_arguments.end();
 		}
 		else {
-			for (auto&& parameter : m_parameters) {
-				if (arg.size() >= parameter.size() && arg.substr(0, parameter.size()) == parameter)
+			for (auto&& argument : m_arguments) {
+				if (arg.size() >= argument.size() && arg.substr(0, argument.size()) == argument)
 					return true;
 			}
 			return false;
 		}
 	}
 	template <class T>
-	void Argument<T>::
+	void Option<T>::
 	operator= (const std::string_view& arg) {
 		if (m_alreadySeen)
-			throw std::runtime_error("Argument \"" + m_name + "\" repeated multiple times: " + std::string{arg});
+			throw std::runtime_error("Option \"" + m_name + "\" repeated multiple times: " + std::string{arg});
 		m_alreadySeen = true;
 
 		if constexpr(std::is_same_v<bool, T>) {
@@ -135,14 +135,14 @@ namespace stypox {
 		}
 		else {
 			std::string argValue;
-			for (auto&& parameter : m_parameters) {
-				if (arg.size() > parameter.size() && arg.substr(0, parameter.size()) == parameter) {
-					argValue = arg.substr(parameter.size());
+			for (auto&& argument : m_arguments) {
+				if (arg.size() > argument.size() && arg.substr(0, argument.size()) == argument) {
+					argValue = arg.substr(argument.size());
 					break;
 				}
 			}
 			if (argValue.empty())
-				throw std::runtime_error("Argument \"" + m_name + "\" requires a value: " + std::string{arg});
+				throw std::runtime_error("Option \"" + m_name + "\" requires a value: " + std::string{arg});
 			
 
 			if constexpr(std::is_integral_v<T>) {
@@ -153,10 +153,10 @@ namespace stypox {
 						throw std::invalid_argument("");
 				}
 				catch (std::invalid_argument&) {
-					throw std::runtime_error("Argument \"" + m_name + "\": \"" + argValue + "\" is not an integer: " + std::string{arg});
+					throw std::runtime_error("Option \"" + m_name + "\": \"" + argValue + "\" is not an integer: " + std::string{arg});
 				}
 				catch (std::out_of_range&) {
-					throw std::runtime_error("Argument \"" + m_name + "\": integer \"" + argValue + "\" is too big and not representable in " + std::to_string(8 * sizeof(long long)) + " bits: " + std::string{arg});
+					throw std::runtime_error("Option \"" + m_name + "\": integer \"" + argValue + "\" is too big and not representable in " + std::to_string(8 * sizeof(long long)) + " bits: " + std::string{arg});
 				}
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
@@ -167,10 +167,10 @@ namespace stypox {
 						throw std::invalid_argument("");
 				}
 				catch (std::invalid_argument&) {
-					throw std::runtime_error("Argument \"" + m_name + "\": \"" + argValue + "\" is not a decimal: " + std::string{arg});
+					throw std::runtime_error("Option \"" + m_name + "\": \"" + argValue + "\" is not a decimal: " + std::string{arg});
 				}
 				catch (std::out_of_range&) {
-					throw std::runtime_error("Argument \"" + m_name + "\": decimal \"" + argValue + "\" is too big and not representable in " + std::to_string(8 * sizeof(long double)) + " bits: " + std::string{arg});
+					throw std::runtime_error("Option \"" + m_name + "\": decimal \"" + argValue + "\" is too big and not representable in " + std::to_string(8 * sizeof(long double)) + " bits: " + std::string{arg});
 				}
 			}
 			else {
@@ -179,43 +179,43 @@ namespace stypox {
 		}
 	}
 	template <class T>
-	void Argument<T>::
+	void Option<T>::
 	checkValidity() const {
 		if (m_required && !m_alreadySeen)
-			throw std::runtime_error("Argument \"" + m_name + "\" is required");
+			throw std::runtime_error("Option \"" + m_name + "\" is required");
 
 		if (!m_validityChecker(m_value)) {
 			if constexpr(std::is_same_v<bool, T>)
-				throw std::runtime_error("Argument \"" + m_name + "\" " + (m_value ? "can't be used" : "is required"));
+				throw std::runtime_error("Option \"" + m_name + "\" " + (m_value ? "can't be used" : "is required"));
 			else if constexpr(std::is_integral_v<T> || std::is_floating_point_v<T>)
-				throw std::runtime_error("Argument \"" + m_name + "\": value " + std::to_string(m_value) + " is not allowed");
+				throw std::runtime_error("Option \"" + m_name + "\": value " + std::to_string(m_value) + " is not allowed");
 			else {
 				if constexpr(std::is_constructible_v<std::string, T>)
-					throw std::runtime_error("Argument \"" + m_name + "\": value " + std::string{m_value} + " is not allowed");
+					throw std::runtime_error("Option \"" + m_name + "\": value " + std::string{m_value} + " is not allowed");
 				else if constexpr(std::is_assignable_v<std::string&, T>)
-					throw std::runtime_error("Argument \"" + m_name + "\": value " + (std::string{} = m_value) + " is not allowed");
+					throw std::runtime_error("Option \"" + m_name + "\": value " + (std::string{} = m_value) + " is not allowed");
 				else
-					throw std::runtime_error("Argument \"" + m_name + "\": value not allowed");
+					throw std::runtime_error("Option \"" + m_name + "\": value not allowed");
 			}
 		}
 	}
 
 	template <class T>
-	std::string Argument<T>::
+	std::string Option<T>::
 	name() const {
 		return m_name;
 	}
 	template <class T>
-	T Argument<T>::
+	T Option<T>::
 	value() const {
 		return m_value;
 	}
 
 	template <class T>
-	std::string Argument<T>::
+	std::string Option<T>::
 	help(size_t descriptionIndentation) const {
 		std::string result = "  ";
-		for (auto&& param : m_parameters) {
+		for (auto&& param : m_arguments) {
 			result.append(param);
 			if constexpr(!std::is_same_v<bool, T>) {
 				if constexpr (std::is_integral_v<T>)
@@ -244,7 +244,7 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	template <class T>
 	bool BasicArgParser<IntType, FloatType, TextType, Enable>::
-	findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg) {
+	findAssign(std::vector<Option<T>>& typeArgs, const std::string_view& arg) {
 		if (auto found = std::find(typeArgs.begin(), typeArgs.end(), arg); found == typeArgs.end()) {
 			return false;
 		}
@@ -257,7 +257,7 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	template <class T>
 	T BasicArgParser<IntType, FloatType, TextType, Enable>::
-	get(const std::vector<Argument<T>>& typeArgs, const std::string& name) {
+	get(const std::vector<Option<T>>& typeArgs, const std::string& name) {
 		for(auto&& arg : typeArgs) {
 			if (arg.name() == name)
 				return arg.value();
@@ -276,7 +276,7 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	template <class T>
 	void BasicArgParser<IntType, FloatType, TextType, Enable>::
-	checkValidity(const std::vector<Argument<T>>& typeArgs) {
+	checkValidity(const std::vector<Option<T>>& typeArgs) {
 		for (auto&& arg : typeArgs)
 			arg.checkValidity();
 	}
