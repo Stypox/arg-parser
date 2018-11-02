@@ -151,6 +151,9 @@ namespace stypox {
 				catch (std::invalid_argument&) {
 					throw std::runtime_error("Argument \"" + m_name + "\": \"" + argValue + "\" is not an integer: " + std::string{arg});
 				}
+				catch (std::out_of_range&) {
+					throw std::runtime_error("Argument \"" + m_name + "\": integer \"" + argValue + "\" is too big and not representable in " + std::to_string(8 * sizeof(long long)) + " bits: " + std::string{arg});
+				}
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				try {
@@ -161,6 +164,9 @@ namespace stypox {
 				}
 				catch (std::invalid_argument&) {
 					throw std::runtime_error("Argument \"" + m_name + "\": \"" + argValue + "\" is not a decimal: " + std::string{arg});
+				}
+				catch (std::out_of_range&) {
+					throw std::runtime_error("Argument \"" + m_name + "\": decimal \"" + argValue + "\" is too big and not representable in " + std::to_string(8 * sizeof(long double)) + " bits: " + std::string{arg});
 				}
 			}
 			else {
