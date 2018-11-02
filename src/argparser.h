@@ -304,12 +304,12 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	bool BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getBool(const std::string& name) const {
-		return get(m_floatArgs, name);
+		return get(m_boolArgs, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	IntType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getInt(const std::string& name) const {
-		return get(m_floatArgs, name);
+		return get(m_intArgs, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	FloatType BasicArgParser<IntType, FloatType, TextType, Enable>::
@@ -319,7 +319,7 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	TextType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getText(const std::string& name) const {
-		return get(m_floatArgs, name);
+		return get(m_textArgs, name);
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
