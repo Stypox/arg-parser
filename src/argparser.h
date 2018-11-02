@@ -80,6 +80,7 @@ namespace stypox {
 					   const std::vector<TextArg>&  textArgs);
 
 		void parse(int argc, char const* argv[]);
+		void validate() const;
 
 		inline bool      getBool(const std::string& name) const;
 		inline IntType   getInt(const std::string& name) const;
@@ -294,7 +295,11 @@ namespace stypox {
 				  findAssign(m_textArgs, arg)))
 				throw std::runtime_error("Unknown argument: " + std::string{arg});
 		}
-
+	}
+	
+	template <class IntType, class FloatType, class TextType, class Enable>
+	void BasicArgParser<IntType, FloatType, TextType, Enable>::
+	validate() const {
 		checkValidity(m_boolArgs);
 		checkValidity(m_intArgs);
 		checkValidity(m_floatArgs);
