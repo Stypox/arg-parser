@@ -108,7 +108,7 @@ namespace stypox {
 		}
 		else {
 			for (auto&& parameter : m_parameters) {
-				if (arg.size() > parameter.size() && arg.substr(0, parameter.size()) == parameter)
+				if (arg.size() >= parameter.size() && arg.substr(0, parameter.size()) == parameter)
 					return true;
 			}
 			return false;
