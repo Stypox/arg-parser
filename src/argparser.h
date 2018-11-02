@@ -17,7 +17,7 @@ namespace stypox {
 		std::string m_description;
 
 		std::vector<std::string> m_parameters;
-		std::optional<std::function<bool(T)>> m_validityChecker;
+		std::function<bool(T)> m_validityChecker;
 		bool m_required;
 
 		T m_value;
@@ -125,6 +125,8 @@ namespace stypox {
 
 		if constexpr(std::is_same_v<bool, T>) {
 			m_value = true;
+			if (!m_validityChecker(m_value))
+				throw std::runtime_error("Argument \"" + m_name + "\": invalid value \"" + (m_value ? "true" : "false") + "\": " + std::string{arg});
 		}
 		else {
 			std::string argValue;
@@ -144,6 +146,9 @@ namespace stypox {
 				m_value = std::stold(argValue);
 			else
 				m_value = argValue;
+			
+			if (!m_validityChecker(m_value))
+				throw std::runtime_error("Argument \"" + m_name + "\": invalid value \"" + argValue + "\": " + std::string{arg});
 		}
 	}
 
