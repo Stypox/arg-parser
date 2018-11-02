@@ -167,7 +167,7 @@ namespace stypox {
 			}
 			
 			if (!m_validityChecker(m_value))
-				throw std::runtime_error("Argument \"" + m_name + "\": invalid value \"" + argValue + "\": " + std::string{arg});
+				throw std::runtime_error("Argument \"" + m_name + "\": value \"" + argValue + "\" is not allowed: " + std::string{arg});
 		}
 	}
 
