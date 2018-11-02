@@ -31,13 +31,13 @@ namespace stypox {
 				 T defaultValue = {},
 				 const std::function<bool(T)>& validityChecker = [](T){ return true; });
 		
-		bool operator== (const std::string_view& arg);
+		bool operator== (const std::string_view& arg) const;
 		void operator= (const std::string_view& arg);
 
-		std::string name();
-		T value();
+		std::string name() const;
+		T value() const;
 
-		std::string help();
+		std::string help() const;
 	};
 
 	template <class IntType, class FloatType, class TextType,
@@ -67,7 +67,7 @@ namespace stypox {
 		static bool findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg);
 
 		template <class T>
-		static T get(std::vector<Argument<T>>& typeArgs, const std::string& name);
+		static T get(const std::vector<Argument<T>>& typeArgs, const std::string& name);
 
 	public:
 		BasicArgParser(const std::string& programName,
@@ -78,12 +78,12 @@ namespace stypox {
 
 		void parse(int argc, char const* argv[]);
 
-		inline bool      getBool(const std::string& name);
-		inline IntType   getInt(const std::string& name);
-		inline FloatType getFloat(const std::string& name);
-		inline TextType  getText(const std::string& name);
+		inline bool      getBool(const std::string& name) const;
+		inline IntType   getInt(const std::string& name) const;
+		inline FloatType getFloat(const std::string& name) const;
+		inline TextType  getText(const std::string& name) const;
 
-		std::string help();
+		std::string help() const;
 	};
 
 	using ArgParser = BasicArgParser<int, float, std::string>;
@@ -104,7 +104,7 @@ namespace stypox {
 	
 	template <class T>
 	bool Argument<T>::
-	operator== (const std::string_view& arg) {
+	operator== (const std::string_view& arg) const {
 		if constexpr(std::is_same_v<T, bool>) {
 			return std::find(m_parameters.begin(), m_parameters.end(), arg) != m_parameters.end();
 		}
@@ -154,18 +154,18 @@ namespace stypox {
 
 	template <class T>
 	std::string Argument<T>::
-	name() {
+	name() const {
 		return m_name;
 	}
 	template <class T>
 	T Argument<T>::
-	value() {
+	value() const {
 		return m_value;
 	}
 
 	template <class T>
 	std::string Argument<T>::
-	help() {
+	help() const {
 		constexpr size_t indentSize = 25; // spaces
 
 		std::string result = "  ";
@@ -209,7 +209,7 @@ namespace stypox {
 	template <class IntType, class FloatType, class TextType, class Enable>
 	template <class T>
 	T BasicArgParser<IntType, FloatType, TextType, Enable>::
-	get(std::vector<Argument<T>>& typeArgs, const std::string& name) {
+	get(const std::vector<Argument<T>>& typeArgs, const std::string& name) {
 		for(auto&& arg : typeArgs) {
 			if (arg.name() == name)
 				return arg.value();
@@ -253,28 +253,28 @@ namespace stypox {
 
 	template <class IntType, class FloatType, class TextType, class Enable>
 	bool BasicArgParser<IntType, FloatType, TextType, Enable>::
-	getBool(const std::string& name) {
+	getBool(const std::string& name) const {
 		return get(m_floatArgs, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	IntType BasicArgParser<IntType, FloatType, TextType, Enable>::
-	getInt(const std::string& name) {
+	getInt(const std::string& name) const {
 		return get(m_floatArgs, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	FloatType BasicArgParser<IntType, FloatType, TextType, Enable>::
-	getFloat(const std::string& name) {
+	getFloat(const std::string& name) const {
 		return get(m_floatArgs, name);
 	}
 	template <class IntType, class FloatType, class TextType, class Enable>
 	TextType BasicArgParser<IntType, FloatType, TextType, Enable>::
-	getText(const std::string& name) {
+	getText(const std::string& name) const {
 		return get(m_floatArgs, name);
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
 	std::string BasicArgParser<IntType, FloatType, TextType, Enable>::
-	help() {
+	help() const {
 		std::string result = m_programName;
 		result.append(": Help screen\n\nUsage: ");
 		result.append(m_executablePath);
