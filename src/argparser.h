@@ -32,6 +32,7 @@ namespace stypox {
 		
 		bool operator== (const std::string_view& arg) const;
 		void operator= (const std::string_view& arg);
+		void checkValidity() const;
 
 		std::string name() const;
 		T value() const;
@@ -67,6 +68,9 @@ namespace stypox {
 
 		template <class T>
 		static T get(const std::vector<Argument<T>>& typeArgs, const std::string& name);
+
+		template <class T>
+		static void checkValidity(const std::vector<Argument<T>>& typeArgs);
 
 	public:
 		BasicArgParser(const std::string& programName,
@@ -123,8 +127,6 @@ namespace stypox {
 
 		if constexpr(std::is_same_v<bool, T>) {
 			m_value = true;
-			if (!m_validityChecker(m_value))
-				throw std::runtime_error("Argument \"" + m_name + "\": value " + (m_value ? "true" : "false") + " is not allowed: " + std::string{arg});
 		}
 		else {
 			std::string argValue;
@@ -163,9 +165,27 @@ namespace stypox {
 			else {
 				m_value = argValue;
 			}
-			
-			if (!m_validityChecker(m_value))
-				throw std::runtime_error("Argument \"" + m_name + "\": value " + argValue + " is not allowed: " + std::string{arg});
+		}
+	}
+	template <class T>
+	void Argument<T>::
+	checkValidity() const {
+		if (m_required && !m_alreadySeen)
+			throw std::runtime_error("Argument \"" + m_name + "\" is required");
+
+		if (!m_validityChecker(m_value)) {
+			if constexpr(std::is_same_v<bool, T>)
+				throw std::runtime_error("Argument \"" + m_name + "\" " + (m_value ? "can't be used" : "is required"));
+			else if constexpr(std::is_integral_v<T> || std::is_floating_point_v<T>)
+				throw std::runtime_error("Argument \"" + m_name + "\": value " + std::to_string(m_value) + " is not allowed");
+			else {
+				if constexpr(std::is_constructible_v<std::string, T>)
+					throw std::runtime_error("Argument \"" + m_name + "\": value " + std::string{m_value} + " is not allowed");
+				else if constexpr(std::is_assignable_v<std::string, T>)
+					throw std::runtime_error("Argument \"" + m_name + "\": value " + (std::string{} = m_value) + " is not allowed");
+				else
+					throw std::runtime_error("Argument \"" + m_name + "\": value not allowed");
+			}
 		}
 	}
 
@@ -243,6 +263,14 @@ namespace stypox {
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
+	template <class T>
+	void BasicArgParser<IntType, FloatType, TextType, Enable>::
+	checkValidity(const std::vector<Argument<T>>& typeArgs) {
+		for (auto&& arg : typeArgs)
+			arg.checkValidity();
+	}
+
+	template <class IntType, class FloatType, class TextType, class Enable>
 	BasicArgParser<IntType, FloatType, TextType, Enable>::
 	BasicArgParser(
 		const std::string& programName,
@@ -266,6 +294,11 @@ namespace stypox {
 				  findAssign(m_textArgs, arg)))
 				throw std::runtime_error("Unknown argument: " + std::string{arg});
 		}
+
+		checkValidity(m_boolArgs);
+		checkValidity(m_intArgs);
+		checkValidity(m_floatArgs);
+		checkValidity(m_textArgs);
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
