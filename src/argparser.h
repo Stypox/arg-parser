@@ -192,7 +192,7 @@ namespace stypox {
 			else {
 				if constexpr(std::is_constructible_v<std::string, T>)
 					throw std::runtime_error("Argument \"" + m_name + "\": value " + std::string{m_value} + " is not allowed");
-				else if constexpr(std::is_assignable_v<std::string, T>)
+				else if constexpr(std::is_assignable_v<std::string&, T>)
 					throw std::runtime_error("Argument \"" + m_name + "\": value " + (std::string{} = m_value) + " is not allowed");
 				else
 					throw std::runtime_error("Argument \"" + m_name + "\": value not allowed");
