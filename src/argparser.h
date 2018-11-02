@@ -37,7 +37,7 @@ namespace stypox {
 		std::string name() const;
 		T value() const;
 
-		std::string help() const;
+		std::string help(size_t descriptionIndentation) const;
 	};
 
 	template <class IntType, class FloatType, class TextType,
@@ -63,6 +63,8 @@ namespace stypox {
 		const std::string m_programName;
 		std::string_view m_executablePath;
 
+		size_t m_descriptionIndentation;
+
 		template <class T>
 		static bool findAssign(std::vector<Argument<T>>& typeArgs, const std::string_view& arg);
 
@@ -77,7 +79,8 @@ namespace stypox {
 					   const std::vector<BoolArg>&  boolArgs,
 					   const std::vector<IntArg>&   intArgs,
 					   const std::vector<FloatArg>& floatArgs,
-					   const std::vector<TextArg>&  textArgs);
+					   const std::vector<TextArg>&  textArgs,
+					   size_t descriptionIndentation = 25);
 
 		void parse(int argc, char const* argv[]);
 		void validate() const;
@@ -209,9 +212,7 @@ namespace stypox {
 
 	template <class T>
 	std::string Argument<T>::
-	help() const {
-		constexpr size_t indentSize = 25; // spaces
-
+	help(size_t descriptionIndentation) const {
 		std::string result = "  ";
 		for (auto&& param : m_parameters) {
 			result.append(param);
@@ -226,8 +227,10 @@ namespace stypox {
 			result += ' ';
 		}
 
-		if (result.size() < indentSize)
-			result.append(std::string(indentSize - result.size(), ' '));
+		if (result.size() < descriptionIndentation)
+			result.append(std::string(descriptionIndentation - result.size(), ' '));
+		else
+			result += ' ';
 		
 		result.append(m_description);
 		result += '\n';
@@ -284,10 +287,11 @@ namespace stypox {
 		const std::vector<BoolArg>&  boolArgs,
 		const std::vector<IntArg>&   intArgs,
 		const std::vector<FloatArg>& floatArgs,
-		const std::vector<TextArg>&  textArgs) :
+		const std::vector<TextArg>&  textArgs,
+		size_t descriptionIndentation) :
 		m_boolArgs{boolArgs}, m_intArgs{intArgs},
 		m_floatArgs{floatArgs}, m_textArgs{textArgs},
-		m_programName{programName} {}
+		m_programName{programName}, m_descriptionIndentation{descriptionIndentation} {}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
 	void BasicArgParser<IntType, FloatType, TextType, Enable>::
@@ -344,17 +348,17 @@ namespace stypox {
 		if (!m_boolArgs.empty()) {
 			result.append("Switchable options:\n");
 			for (auto&& boolArg : m_boolArgs)
-				result.append(boolArg.help());
+				result.append(boolArg.help(m_descriptionIndentation));
 			result += '\n';
 		}
 
 		result.append("Value options (I=integer, D=decimal, T=text):\n");
 		for (auto&& intArg : m_intArgs)
-			result.append(intArg.help());
+			result.append(intArg.help(m_descriptionIndentation));
 		for (auto&& floatArg : m_floatArgs)
-			result.append(floatArg.help());
+			result.append(floatArg.help(m_descriptionIndentation));
 		for (auto&& textArg : m_textArgs)
-			result.append(textArg.help());
+			result.append(textArg.help(m_descriptionIndentation));
 		
 		return result;
 	}
