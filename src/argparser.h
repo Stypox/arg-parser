@@ -13,12 +13,12 @@ namespace stypox {
 	public:
 		using value_type = T;
 	private:
-		std::string m_name;
-		std::string m_description;
+		const std::string m_name;
+		const std::string m_description;
 
-		std::vector<std::string> m_parameters;
-		std::function<bool(T)> m_validityChecker;
-		bool m_required;
+		const std::vector<std::string> m_parameters;
+		const std::function<bool(T)> m_validityChecker;
+		const bool m_required;
 
 		T m_value;
 		bool m_alreadySeen = false;
@@ -59,7 +59,7 @@ namespace stypox {
 		std::vector<FloatArg> m_floatArgs;
 		std::vector<TextArg>  m_textArgs;
 
-		std::string m_programName;
+		const std::string m_programName;
 		std::string_view m_executablePath;
 
 		template <class T>
