@@ -4,7 +4,7 @@ A **C++** library that **parses command line arguments** and automatically gener
 
 # Features
 
-## Options
+### **Options**
 There are four types of options that can be parsed:
  - **Boolean**: they aren't followed by any value and evaluate to `false`, by default, when they are not specified and to `true` when they are.
  - **Integer**: they except an integer value. The maximum size is the same as `long long`. In the help screen they are represented by an I.
@@ -18,7 +18,7 @@ Every option has:
  - a ***default value***: when not set, the user is required to provide a value for the option via command line;
  - a ***validity checker*** function: used to determine whether a value is valid or not;
 
-## Error checking and reporting
+### **Error checking and reporting**
 During the parsing process every argument has to meet these requirements:
  - it must have a **corresponding option**;
  - that option should **not have been encountered** already;
@@ -32,7 +32,7 @@ During the validation process every computed option has to meet these requiremen
 
 The parsing process and the validation process are **separate**, so that even if an option is invalid no error is thrown until the validation starts. This is useful, for example, to display the help screen when `--help` is provided, even if other options are invalid. Every error contains a **detailed description** about what caused it.
 
-## Other
+### **Other**
  - The intentation of the description of sections can be changed.
  - The first argument is considered, by default, the executable path, but this can be manually changed.
 
@@ -45,23 +45,23 @@ All types are defined in `namespace stypox`
 <br>
 `BasicArgParser` is the class that does the job of parsing arguments. A type can be chosen manually for integer, floating-point and text options. The preconfigured `ArgParser` is an alias for `BasicArgParser<int, float, std::string>`.
 
-## BasicArgParser::BasicArgParser()
+### **BasicArgParser::BasicArgParser()**
 Takes, in order, 7 arguments: the program name, a list of boolean options, a list of integer options, a list of decimal options, a list of text options, a boolean representing whether the first argument has to be considered the executable path (defaults to 25), the size of the indentation.  
 Constructs the BasicArgParser object. It will be constexpr in C++20.
 
-## BasicArgParser::parse()
+### **BasicArgParser::parse()**
 Takes 2 arguments: the number of arguments and an array of pointers to char.  
 Parses all the arguments, reports parsing errors (by throwing std::runtime_error) as described above, saves the new values for options.
 
-## BasicArgParser::validate()
+### **BasicArgParser::validate()**
 Takes no argument.  
 Reports logical errors (by throwing std::runtime_error) as described above.
 
-## BasicArgParser::getBool(), getInt(), getFloat(), getText()
+### **BasicArgParser::getBool(), getInt(), getFloat(), getText()**
 They take 1 argument: the name of the option to look for.  
 Returns the value of that option; throws std::out_of_range.
 
-## BasicArgParser::help()
+### **BasicArgParser::help()**
 Takes no argument.  
 Returns a string containing the help screen. The indentation of the description of options can be set in the constructor. It will be constexpr in C++20. It is formatted this way (see example below):
 ```
@@ -82,7 +82,7 @@ Value options (I=integer, D=decimal, T=text):
 <br>
 ``Option`` is the class that keeps information about every option.
 
-## Option::Option()
+### **Option::Option()**
 Takes 5 arguments: the name, the description, a list of possible arguments, the default value (defaults to the default value of the type and a validity checker function (defaults to a function that always returns true). The default value is of type `std::optional`, so if there is no default value (i.e. the option is required) it can be set to `{}` (= no default value).  
 Constructs the Option object. It will be constexpr in C++20.
 
