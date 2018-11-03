@@ -363,7 +363,7 @@ namespace stypox {
 				result.append(boolArg.help(m_descriptionIndentation));
 		}
 
-		if (!m_intArgs.empty() && !m_floatArgs.empty() && !m_textArgs.empty()) {
+		if (!m_intArgs.empty() || !m_floatArgs.empty() || !m_textArgs.empty()) {
 			result.append("\nValue options (I=integer, D=decimal, T=text):\n");
 			for (auto&& intArg : m_intArgs)
 				result.append(intArg.help(m_descriptionIndentation));
