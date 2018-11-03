@@ -38,7 +38,11 @@ The parsing process and the validation process are **separate**, so that even if
 
 # Installation
 Just **download** the header file inside the subfolder src/ and **`#include`** it into your project!
+
 # Documentation
+All types are defined in `namespace stypox`
+<br>
+<br>
 `BasicArgParser` is the class that does the job of parsing arguments. A type can be chosen manually for integer, floating-point and text options. The preconfigured `ArgParser` is an alias for `BasicArgParser<int, float, std::string>`.
 
 ## BasicArgParser::BasicArgParser()
