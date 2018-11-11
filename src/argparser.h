@@ -63,7 +63,7 @@ namespace stypox {
 		std::vector<TextArg>  m_textOptions;
 
 		const std::string m_programName;
-		std::optional<std::string_view> m_executablePath;
+		std::optional<std::string> m_executablePath;
 
 		size_t m_descriptionIndentation;
 
@@ -86,6 +86,7 @@ namespace stypox {
 					   size_t descriptionIndentation = 25);
 
 		void parse(int argc, char const* argv[]);
+		void parse(const std::vector<std::string>& args);
 		void validate() const;
 		void reset();
 
@@ -320,6 +321,22 @@ namespace stypox {
 				  findAssign(m_floatOptions, arg) ||
 				  findAssign(m_textOptions, arg)))
 				throw std::runtime_error("Unknown argument: " + std::string{arg});
+		}
+	}
+	template <class IntType, class FloatType, class TextType, class Enable>
+	void BasicArgParser<IntType, FloatType, TextType, Enable>::
+	parse(const std::vector<std::string>& args) {
+		if (m_executablePath.has_value()) { // if the first argument has to be used as executable path
+			if (args.empty())
+				throw std::out_of_range("stypox::BasicArgParser::parse(): too few items");
+			m_executablePath = args[0];
+		}
+		for (auto arg = args.begin() + m_executablePath.has_value(); arg != args.end(); ++arg) {
+			if (!(findAssign(m_boolOptions, *arg) ||
+				  findAssign(m_intOptions, *arg) ||
+				  findAssign(m_floatOptions, *arg) ||
+				  findAssign(m_textOptions, *arg)))
+				throw std::runtime_error("Unknown argument: " + *arg);
 		}
 	}
 	template <class IntType, class FloatType, class TextType, class Enable>
