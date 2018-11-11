@@ -25,10 +25,10 @@ namespace stypox {
 
 	public:
 		Option(const std::string& name,
-				 const std::string& description,
-				 const std::vector<std::string>& arguments,
-				 const std::optional<T>& defaultValue = {{}},
-				 const std::function<bool(T)>& validityChecker = [](T){ return true; });
+			   const std::string& description,
+			   const std::vector<std::string>& arguments,
+			   const std::optional<T>& defaultValue = std::optional<T>{T{}},
+			   const std::function<bool(T)>& validityChecker = [](T){ return true; });
 		
 		bool operator== (const std::string_view& arg) const;
 		void operator= (const std::string_view& arg);
