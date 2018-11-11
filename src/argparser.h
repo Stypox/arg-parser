@@ -20,6 +20,7 @@ namespace stypox {
 		const std::function<bool(T)> m_validityChecker;
 		const bool m_required;
 
+		T m_defaultValue;
 		T m_value;
 		bool m_alreadySeen = false;
 
@@ -33,6 +34,7 @@ namespace stypox {
 		bool operator== (const std::string_view& arg) const;
 		void operator= (const std::string_view& arg);
 		void checkValidity() const;
+		void reset();
 
 		std::string name() const;
 		T value() const;
@@ -85,6 +87,7 @@ namespace stypox {
 
 		void parse(int argc, char const* argv[]);
 		void validate() const;
+		void reset();
 
 		inline bool      getBool(const std::string& name) const;
 		inline IntType   getInt(const std::string& name) const;
@@ -107,7 +110,8 @@ namespace stypox {
 		const std::function<bool(T)>& validityChecker) :
 		m_name{name}, m_description{description},
 		m_arguments{arguments}, m_validityChecker{validityChecker},
-		m_required{!defaultValue.has_value()}, m_value{defaultValue.has_value() ? *defaultValue : T{}} {}
+		m_required{!defaultValue.has_value()}, m_defaultValue{defaultValue.has_value() ? *defaultValue : T{}},
+		m_value{m_defaultValue} {}
 	
 	template <class T>
 	bool Option<T>::
@@ -198,6 +202,11 @@ namespace stypox {
 					throw std::runtime_error("Option \"" + m_name + "\": value not allowed");
 			}
 		}
+	}
+	template <class T>
+	void Option<T>::
+	reset() {
+		m_value = m_defaultValue;
 	}
 
 	template <class T>
@@ -313,7 +322,6 @@ namespace stypox {
 				throw std::runtime_error("Unknown argument: " + std::string{arg});
 		}
 	}
-	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	void BasicArgParser<IntType, FloatType, TextType, Enable>::
 	validate() const {
@@ -321,6 +329,14 @@ namespace stypox {
 		checkValidity(m_intArgs);
 		checkValidity(m_floatArgs);
 		checkValidity(m_textArgs);
+	}
+	template <class IntType, class FloatType, class TextType, class Enable>
+	void BasicArgParser<IntType, FloatType, TextType, Enable>::
+	reset() {
+		for (auto&& option : m_boolArgs) option.reset();
+		for (auto&& option : m_intArgs) option.reset();
+		for (auto&& option : m_floatArgs) option.reset();
+		for (auto&& option : m_textArgs) option.reset();
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
