@@ -57,10 +57,10 @@ namespace stypox {
 		using TextArg  = Option<TextType>;
 
 	private:
-		std::vector<BoolArg>  m_boolArgs;
-		std::vector<IntArg>   m_intArgs;
-		std::vector<FloatArg> m_floatArgs;
-		std::vector<TextArg>  m_textArgs;
+		std::vector<BoolArg>  m_boolOptions;
+		std::vector<IntArg>   m_intOptions;
+		std::vector<FloatArg> m_floatOptions;
+		std::vector<TextArg>  m_textOptions;
 
 		const std::string m_programName;
 		std::optional<std::string_view> m_executablePath;
@@ -300,8 +300,8 @@ namespace stypox {
 		const std::vector<TextArg>&  textArgs,
 		bool firstArgumentIsExecutablePath,
 		size_t descriptionIndentation) :
-		m_boolArgs{boolArgs}, m_intArgs{intArgs},
-		m_floatArgs{floatArgs}, m_textArgs{textArgs},
+		m_boolOptions{boolArgs}, m_intOptions{intArgs},
+		m_floatOptions{floatArgs}, m_textOptions{textArgs},
 		m_programName{programName}, m_executablePath{firstArgumentIsExecutablePath ? std::optional<std::string_view>{""} : std::optional<std::string_view>{}},
 		m_descriptionIndentation{descriptionIndentation} {}
 
@@ -315,49 +315,49 @@ namespace stypox {
 		}
 		for (int argIt = m_executablePath.has_value(); argIt < argc; ++argIt) {
 			std::string_view arg{argv[argIt]};
-			if (!(findAssign(m_boolArgs, arg) ||
-				  findAssign(m_intArgs, arg) ||
-				  findAssign(m_floatArgs, arg) ||
-				  findAssign(m_textArgs, arg)))
+			if (!(findAssign(m_boolOptions, arg) ||
+				  findAssign(m_intOptions, arg) ||
+				  findAssign(m_floatOptions, arg) ||
+				  findAssign(m_textOptions, arg)))
 				throw std::runtime_error("Unknown argument: " + std::string{arg});
 		}
 	}
 	template <class IntType, class FloatType, class TextType, class Enable>
 	void BasicArgParser<IntType, FloatType, TextType, Enable>::
 	validate() const {
-		checkValidity(m_boolArgs);
-		checkValidity(m_intArgs);
-		checkValidity(m_floatArgs);
-		checkValidity(m_textArgs);
+		checkValidity(m_boolOptions);
+		checkValidity(m_intOptions);
+		checkValidity(m_floatOptions);
+		checkValidity(m_textOptions);
 	}
 	template <class IntType, class FloatType, class TextType, class Enable>
 	void BasicArgParser<IntType, FloatType, TextType, Enable>::
 	reset() {
-		for (auto&& option : m_boolArgs) option.reset();
-		for (auto&& option : m_intArgs) option.reset();
-		for (auto&& option : m_floatArgs) option.reset();
-		for (auto&& option : m_textArgs) option.reset();
+		for (auto&& option : m_boolOptions) option.reset();
+		for (auto&& option : m_intOptions) option.reset();
+		for (auto&& option : m_floatOptions) option.reset();
+		for (auto&& option : m_textOptions) option.reset();
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
 	bool BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getBool(const std::string& name) const {
-		return get(m_boolArgs, name);
+		return get(m_boolOptions, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	IntType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getInt(const std::string& name) const {
-		return get(m_intArgs, name);
+		return get(m_intOptions, name);
 	}	
 	template <class IntType, class FloatType, class TextType, class Enable>
 	FloatType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getFloat(const std::string& name) const {
-		return get(m_floatArgs, name);
+		return get(m_floatOptions, name);
 	}
 	template <class IntType, class FloatType, class TextType, class Enable>
 	TextType BasicArgParser<IntType, FloatType, TextType, Enable>::
 	getText(const std::string& name) const {
-		return get(m_textArgs, name);
+		return get(m_textOptions, name);
 	}
 
 	template <class IntType, class FloatType, class TextType, class Enable>
@@ -373,19 +373,19 @@ namespace stypox {
 			result.append("[OPTIONS...]\n");
 		}
 
-		if (!m_boolArgs.empty()) {
+		if (!m_boolOptions.empty()) {
 			result.append("\nSwitchable options:\n");
-			for (auto&& boolArg : m_boolArgs)
+			for (auto&& boolArg : m_boolOptions)
 				result.append(boolArg.help(m_descriptionIndentation));
 		}
 
-		if (!m_intArgs.empty() || !m_floatArgs.empty() || !m_textArgs.empty()) {
+		if (!m_intOptions.empty() || !m_floatOptions.empty() || !m_textOptions.empty()) {
 			result.append("\nValue options (I=integer, D=decimal, T=text):\n");
-			for (auto&& intArg : m_intArgs)
+			for (auto&& intArg : m_intOptions)
 				result.append(intArg.help(m_descriptionIndentation));
-			for (auto&& floatArg : m_floatArgs)
+			for (auto&& floatArg : m_floatOptions)
 				result.append(floatArg.help(m_descriptionIndentation));
-			for (auto&& textArg : m_textArgs)
+			for (auto&& textArg : m_textOptions)
 				result.append(textArg.help(m_descriptionIndentation));
 		}
 		
