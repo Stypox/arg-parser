@@ -208,6 +208,7 @@ namespace stypox {
 	void Option<T>::
 	reset() {
 		m_value = m_defaultValue;
+		m_alreadySeen = false;
 	}
 
 	template <class T>
