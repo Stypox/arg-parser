@@ -37,7 +37,7 @@ The parsing process and the validation process are **separate**, so that even if
  - The first argument is considered, by default, the executable path, but this can be manually changed.
 
 # Installation
-Just **download** the header file inside the subfolder src/ and **`#include`** it into your project! Note: it requires C++17, so add to your compiler options `-std=c++17`.
+Just **download** the header file `argparser.h` and **`#include`** it into your project! Note: it requires C++17, so add to your compiler options `-std=c++17`.
 
 # Documentation
 All types are defined in `namespace stypox`
