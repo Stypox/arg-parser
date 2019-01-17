@@ -8,12 +8,12 @@
 #include <optional>
 #include <vector>
 
-namespace stypox {	
+namespace stypox {
 	template<class... Args>
 	constexpr std::array<std::string_view, sizeof...(Args)> args(const Args&... list) {
 		return {list...};
 	}
-	
+
 	template<class T, size_t N>
 	class OptionBase {
 		bool m_alreadySeen;
@@ -69,16 +69,16 @@ namespace stypox {
 				result += '\n';
 				result.append(std::string(descriptionIndentation, ' '));
 			}
-			
+
 			if (m_required)
 				result += '*';
 			result.append(m_help);
 			result += '\n';
-			
+
 			return result;
 		}
 	public:
-		// @return true if @param arg is valid 
+		// @return true if @param arg is valid
 		virtual bool assign(const std::string_view& arg) = 0;
 		void reset() {
 			m_alreadySeen = false;
@@ -327,7 +327,7 @@ namespace stypox {
 	public:
 		HelpSection(const std::string_view& title) :
 			m_title{title} {}
-		
+
 		std::string help(size_t) const {
 			return std::string{m_title} + ":\n";
 		}
@@ -349,7 +349,7 @@ namespace stypox {
 				if (!m_doneAssigning)
 					m_doneAssigning = std::get<I>(m_options).assign(arg);
 			if constexpr(I+1 != sizeof...(Options))
-				assign<I+1>(arg);		
+				assign<I+1>(arg);
 		}
 
 		template<size_t I = 0>
@@ -391,7 +391,7 @@ namespace stypox {
 				size_t descriptionIndentation = 25) :
 			m_options{options}, m_programName{programName},
 			m_executableName{}, m_descriptionIndentation{descriptionIndentation} {}
-		
+
 		template<class Iter>
 	#if __cplusplus > 201703L || defined(__cpp_concepts)
 		requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
@@ -425,7 +425,7 @@ namespace stypox {
 		void parse(int argc, char const* argv[], bool firstArgumentIsExecutablePath = true) {
 			return parse(argv, argv+argc, firstArgumentIsExecutablePath);
 		}
-		
+
 		template<class Iter>
 	#if __cplusplus > 201703L || defined(__cpp_concepts)
 		requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
