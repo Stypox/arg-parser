@@ -526,15 +526,14 @@ namespace stypox {
 		}
 
 		std::string help() const {
-			std::string result{m_programName};
-			result.append(": Help screen\n");
-			result.append(usage());
+			std::string result = usage();
 			result.append(optionsHelp());
 			result += '\n';
 			return result;
 		}
 		std::string usage() const {
-			std::string result = "Usage:";
+			std::string result{m_programName};
+			result.append("\nLegend: I=integer; D=decimal; T=text; S=custom string;\nUsage:");
 			if (m_executableName.has_value()) {
 				result += ' ';
 				result.append(*m_executableName);
