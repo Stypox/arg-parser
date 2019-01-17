@@ -75,23 +75,37 @@ namespace stypox {
 	class SwitchOption : public OptionBase<T, N> {
 		const T m_valueWhenSet;
 	public:
+	#if __cplusplus <= 201703L && !defined(__cpp_concepts)
+		template<typename Dummy = T /* useless, but needed for SFINAE */>
+	#endif
 		SwitchOption(const std::string_view& name,
 					T& output,
 					const std::array<std::string_view, N>& arguments,
 					const std::string_view& help,
 					const T& valueWhenSet = true,
+				#if __cplusplus > 201703L || defined(__cpp_concepts)
 					bool required = false)
 					requires std::is_same_v<T, bool> :
+				#else
+					typename std::enable_if_t<std::is_same_v<Dummy, bool>, bool> required = false) :
+				#endif
 			OptionBase<T, N>{name, output, arguments, help, required},
 			m_valueWhenSet{valueWhenSet} {}
 
+	#if __cplusplus <= 201703L && !defined(__cpp_concepts)
+		template<typename Dummy = T /* useless, but needed for SFINAE */>
+	#endif
 		SwitchOption(const std::string_view& name,
 					T& output,
 					const std::array<std::string_view, N>& arguments,
 					const std::string_view& help,
 					const T& valueWhenSet,
+				#if __cplusplus > 201703L || defined(__cpp_concepts)
 					bool required = false)
 					requires !std::is_same_v<T, bool> :
+				#else
+					typename std::enable_if_t<!std::is_same_v<Dummy, bool>, bool> required = false) :
+				#endif
 			OptionBase<T, N>{name, output, arguments, help, required},
 			m_valueWhenSet{valueWhenSet} {}
 
@@ -112,7 +126,9 @@ namespace stypox {
 	};
 
 	template<class T, size_t N, class F>
+#if __cplusplus > 201703L || defined(__cpp_concepts)
 	requires requires (T t, const F& f, const std::string_view& s) { t = f(s); }
+#endif
 	class ManualOption : public OptionBase<T, N> {
 		const F m_assignerFunctor;
 	public:
@@ -214,7 +230,9 @@ namespace stypox {
 	}
 
 	template<class T, size_t N, class F>
+#if __cplusplus > 201703L || defined(__cpp_concepts)
 	requires requires (bool b, const F& f, const T& s) { b = f(s); }
+#endif
 	class Option : public OptionBase<T, N> {
 		const F m_validityChecker;
 	public:
@@ -294,28 +312,50 @@ namespace stypox {
 		bool m_doneAssigning;
 
 		template<size_t I = 0>
-		inline void assign(const std::string_view& arg) {
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		inline void
+	#else
+		inline typename std::enable_if_t<!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
+	#endif
+		assign(const std::string_view& arg) {
 			if constexpr(!std::is_same_v<std::tuple_element<I, std::tuple<Options...>>, HelpSection>)
 				if (!m_doneAssigning)
 					m_doneAssigning = std::get<I>(m_options).assign(arg);
 			if constexpr(I+1 != sizeof...(Options))
 				assign<I+1>(arg);		
 		}
-		template<size_t I = 0> requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
-		inline void assign(const std::string_view& arg) {
+		template<size_t I = 0>
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
+		inline void
+	#else
+		inline typename std::enable_if_t<std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
+	#endif
+		assign(const std::string_view& arg) {
 			// skip HelpSection
 			if constexpr(I+1 != sizeof...(Options))
 				assign<I+1>(arg);		
 		}
 
 		template<size_t I = 0>
-		inline void checkValidity() const {
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		inline void
+	#else
+		inline typename std::enable_if_t<!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
+	#endif
+		checkValidity() const {
 			std::get<I>(m_options).checkValidity();
 			if constexpr(I+1 != sizeof...(Options))
 				checkValidity<I+1>();
 		}
-		template<size_t I = 0> requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
-		inline void checkValidity() const {
+		template<size_t I = 0>
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
+		inline void
+	#else
+		inline typename std::enable_if_t<std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
+	#endif
+		checkValidity() const {
 			// skip HelpSection
 			if constexpr(I+1 != sizeof...(Options))
 				checkValidity<I+1>();
@@ -337,8 +377,10 @@ namespace stypox {
 			m_executableName{}, m_descriptionIndentation{descriptionIndentation} {}
 		
 		template<class Iter>
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
 		requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
 			std::is_convertible_v<typename std::iterator_traits<Iter>::value_type, std::string_view>
+	#endif
 		void parse(Iter first, const Iter& last, bool firstArgumentIsExecutablePath) {
 			if (firstArgumentIsExecutablePath) {
 				if (first == last)
