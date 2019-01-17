@@ -107,7 +107,7 @@ namespace stypox {
 					const T& valueWhenSet = true,
 				#if __cplusplus > 201703L || defined(__cpp_concepts)
 					bool required = false)
-					requires std::is_same_v<T, bool> :
+						requires std::is_same_v<T, bool> :
 				#else
 					typename std::enable_if_t<std::is_same_v<Dummy, bool>, bool> required = false) :
 				#endif
@@ -124,7 +124,7 @@ namespace stypox {
 					const T& valueWhenSet,
 				#if __cplusplus > 201703L || defined(__cpp_concepts)
 					bool required = false)
-					requires !std::is_same_v<T, bool> :
+						requires !std::is_same_v<T, bool> :
 				#else
 					typename std::enable_if_t<!std::is_same_v<Dummy, bool>, bool> required = false) :
 				#endif
@@ -151,9 +151,9 @@ namespace stypox {
 	};
 
 	template<class T, size_t N, class F>
-#if __cplusplus > 201703L || defined(__cpp_concepts)
-	requires requires (T t, const F& f, const std::string_view& s) { t = f(s); }
-#endif
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		requires requires (T t, const F& f, const std::string_view& s) { t = f(s); }
+	#endif
 	class ManualOption : public OptionBase<T, N> {
 		const F m_assignerFunctor;
 	public:
@@ -258,9 +258,9 @@ namespace stypox {
 	}
 
 	template<class T, size_t N, class F>
-#if __cplusplus > 201703L || defined(__cpp_concepts)
-	requires requires (bool b, const F& f, const T& s) { b = f(s); }
-#endif
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		requires requires (bool b, const F& f, const T& s) { b = f(s); }
+	#endif
 	class Option : public OptionBase<T, N> {
 		const F m_validityChecker;
 
@@ -393,10 +393,10 @@ namespace stypox {
 			m_executableName{}, m_descriptionIndentation{descriptionIndentation} {}
 
 		template<class Iter>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
-			std::is_convertible_v<typename std::iterator_traits<Iter>::value_type, std::string_view>
-	#endif
+		#if __cplusplus > 201703L || defined(__cpp_concepts)
+			requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
+				std::is_convertible_v<typename std::iterator_traits<Iter>::value_type, std::string_view>
+		#endif
 		void parse(Iter first, const Iter& last, bool firstArgumentIsExecutablePath) {
 			if (firstArgumentIsExecutablePath) {
 				if (first == last)
@@ -427,10 +427,10 @@ namespace stypox {
 		}
 
 		template<class Iter>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
-			std::is_convertible_v<typename std::iterator_traits<Iter>::value_type, std::string_view>
-	#endif
+		#if __cplusplus > 201703L || defined(__cpp_concepts)
+			requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
+				std::is_convertible_v<typename std::iterator_traits<Iter>::value_type, std::string_view>
+		#endif
 		std::vector<std::string> parsePositional(Iter first, const Iter& last, bool firstArgumentIsExecutablePath) {
 			if (firstArgumentIsExecutablePath) {
 				if (first == last)
