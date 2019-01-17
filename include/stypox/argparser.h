@@ -62,7 +62,7 @@ namespace stypox {
 				result += ' ';
 			}
 
-			if (result.size() < descriptionIndentation) {
+			if (result.size() <= descriptionIndentation) {
 				result.append(std::string(descriptionIndentation - result.size(), ' '));
 			}
 			else {
