@@ -39,6 +39,21 @@ namespace stypox {
 			m_alreadySeen = true;
 		}
 
+		std::string usage(const std::string_view& typeName) const {
+			std::string result;
+			if constexpr(N >= 1) {
+				result += ' ';
+				if(!m_required)
+					result += '[';
+
+				result.append(m_arguments[0]);
+				result.append(typeName);
+
+				if(!m_required)
+					result += ']';
+			}
+			return result;
+		}
 		std::string help(size_t descriptionIndentation, const std::string_view& typeName) const {
 			std::string result = "  ";
 			for (auto&& argument : m_arguments) {
@@ -62,21 +77,6 @@ namespace stypox {
 			
 			return result;
 		}
-		std::string usage(const std::string_view& typeName) const {
-			std::string result;
-			if constexpr(N >= 1) {
-				result += ' ';
-				if(!m_required)
-					result += '[';
-
-				result.append(m_arguments[0]);
-				result.append(typeName);
-
-				if(!m_required)
-					result += ']';
-			}
-			return result;
-		}
 	public:
 		// @return true if @param arg is valid 
 		virtual bool assign(const std::string_view& arg) = 0;
@@ -89,8 +89,8 @@ namespace stypox {
 				throw std::runtime_error("Option " + std::string{m_name} + " is required");
 		}
 
-		virtual std::string help(size_t descriptionIndentation) const = 0;
 		virtual std::string usage() const = 0;
+		virtual std::string help(size_t descriptionIndentation) const = 0;
 	};
 
 	template<size_t N, class T = bool>
@@ -142,11 +142,11 @@ namespace stypox {
 			}
 		}
 
-		std::string help(size_t descriptionIndentation) const override {
-			return OptionBase<T, N>::help(descriptionIndentation, "");
-		}
 		std::string usage() const override {
 			return OptionBase<T, N>::usage("");
+		}
+		std::string help(size_t descriptionIndentation) const override {
+			return OptionBase<T, N>::help(descriptionIndentation, "");
 		}
 	};
 
@@ -186,11 +186,11 @@ namespace stypox {
 			}
 		}
 
-		std::string help(size_t descriptionIndentation) const override {
-			return OptionBase<T, N>::help(descriptionIndentation, "S");
-		}
 		std::string usage() const override {
 			return OptionBase<T, N>::usage("S");
+		}
+		std::string help(size_t descriptionIndentation) const override {
+			return OptionBase<T, N>::help(descriptionIndentation, "S");
 		}
 	};
 
@@ -314,11 +314,11 @@ namespace stypox {
 			}
 		}
 
-		std::string help(size_t descriptionIndentation) const override {
-			return OptionBase<T, N>::help(descriptionIndentation, typeName());
-		}
 		std::string usage() const override {
 			return OptionBase<T, N>::usage(typeName());
+		}
+		std::string help(size_t descriptionIndentation) const override {
+			return OptionBase<T, N>::help(descriptionIndentation, typeName());
 		}
 	};
 
@@ -472,12 +472,6 @@ namespace stypox {
 			resetOptions();
 		}
 
-		std::string help() const {
-			std::string result = usage();
-			result.append(optionsHelp());
-			result += '\n';
-			return result;
-		}
 		std::string usage() const {
 			std::string result{m_programName};
 			result.append("\nLegend: I=integer; D=decimal; T=text; S=custom string;\nUsage:");
@@ -487,6 +481,12 @@ namespace stypox {
 			}
 
 			result.append(optionsUsage());
+			result += '\n';
+			return result;
+		}
+		std::string help() const {
+			std::string result = usage();
+			result.append(optionsHelp());
 			result += '\n';
 			return result;
 		}
