@@ -30,7 +30,7 @@ namespace stypox {
 				const std::string_view& help,
 				bool required) :
 			m_alreadySeen{false}, m_required{required},
-			m_output{output}, m_name{name},
+			m_name{name}, m_output{output},
 			m_arguments{arguments}, m_help{help} {}
 
 		void updateAlreadySeen(const std::string_view& arg) {
