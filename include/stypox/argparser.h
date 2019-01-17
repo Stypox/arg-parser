@@ -330,7 +330,7 @@ namespace stypox {
 			m_title{title} {}
 
 		std::string help(size_t) const {
-			return std::string{m_title} + ":\n";
+			return std::string{m_title} + '\n';
 		}
 	};
 
