@@ -62,6 +62,9 @@ namespace stypox {
 	public:
 		// @return true if @param arg is valid 
 		virtual bool assign(const std::string_view& arg) = 0;
+		void reset() {
+			m_alreadySeen = false;
+		}
 
 		void checkValidity() const {
 			if (m_required && !m_alreadySeen)
@@ -362,6 +365,30 @@ namespace stypox {
 		}
 
 		template<size_t I = 0>
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		inline void
+	#else
+		inline typename std::enable_if_t<!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
+	#endif
+		resetOptions() {
+			std::get<I>(m_options).reset();
+			if constexpr(I+1 != sizeof...(Options))
+				resetOptions<I+1>();
+		}
+		template<size_t I = 0>
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
+		inline void
+	#else
+		inline typename std::enable_if_t<std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
+	#endif
+		resetOptions() {
+			// skip HelpSection
+			if constexpr(I+1 != sizeof...(Options))
+				resetOptions<I+1>();
+		}
+
+		template<size_t I = 0>
 		inline std::string optionsHelp() const {
 			std::string result = std::get<I>(m_options).help(m_descriptionIndentation);
 			if constexpr(I+1 != sizeof...(Options))
@@ -389,7 +416,7 @@ namespace stypox {
 				++first;
 			}
 			else {
-				m_executableName = {};
+				m_executableName = std::nullopt;
 			}
 
 			for(; first != last; ++first) {
@@ -412,6 +439,11 @@ namespace stypox {
 
 		void validate() const {
 			checkValidity();
+		}
+
+		void reset() {
+			m_executableName = std::nullopt;
+			resetOptions();
 		}
 
 		std::string help() const {
