@@ -348,75 +348,26 @@ namespace stypox {
 		bool m_doneAssigning;
 
 		template<size_t I = 0>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		inline void
-	#else
-		inline typename std::enable_if_t<!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
-	#endif
-		assign(const std::string_view& arg) {
-			if constexpr(!std::is_same_v<std::tuple_element<I, std::tuple<Options...>>, HelpSection>)
+		inline void assign(const std::string_view& arg) {
+			if constexpr(!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>)
 				if (!m_doneAssigning)
 					m_doneAssigning = std::get<I>(m_options).assign(arg);
 			if constexpr(I+1 != sizeof...(Options))
 				assign<I+1>(arg);		
 		}
-		template<size_t I = 0>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
-		inline void
-	#else
-		inline typename std::enable_if_t<std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
-	#endif
-		assign(const std::string_view& arg) {
-			// skip HelpSection
-			if constexpr(I+1 != sizeof...(Options))
-				assign<I+1>(arg);		
-		}
 
 		template<size_t I = 0>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		inline void
-	#else
-		inline typename std::enable_if_t<!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
-	#endif
-		checkValidity() const {
-			std::get<I>(m_options).checkValidity();
-			if constexpr(I+1 != sizeof...(Options))
-				checkValidity<I+1>();
-		}
-		template<size_t I = 0>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
-		inline void
-	#else
-		inline typename std::enable_if_t<std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
-	#endif
-		checkValidity() const {
-			// skip HelpSection
+		inline void checkValidity() const {
+			if constexpr(!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>)
+				std::get<I>(m_options).checkValidity();
 			if constexpr(I+1 != sizeof...(Options))
 				checkValidity<I+1>();
 		}
 
 		template<size_t I = 0>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		inline void
-	#else
-		inline typename std::enable_if_t<!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
-	#endif
-		resetOptions() {
-			std::get<I>(m_options).reset();
-			if constexpr(I+1 != sizeof...(Options))
-				resetOptions<I+1>();
-		}
-		template<size_t I = 0>
-	#if __cplusplus > 201703L || defined(__cpp_concepts)
-		requires std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>
-		inline void
-	#else
-		inline typename std::enable_if_t<std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>, void>
-	#endif
-		resetOptions() {
-			// skip HelpSection
+		inline void resetOptions() {
+			if constexpr(!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>)
+				std::get<I>(m_options).reset();
 			if constexpr(I+1 != sizeof...(Options))
 				resetOptions<I+1>();
 		}
