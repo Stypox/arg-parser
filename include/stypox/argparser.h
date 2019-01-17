@@ -55,6 +55,8 @@ namespace stypox {
 				result.append(std::string(descriptionIndentation, ' '));
 			}
 			
+			if (m_required)
+				result += '*';
 			result.append(m_help);
 			result += '\n';
 			
