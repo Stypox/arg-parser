@@ -263,6 +263,12 @@ namespace stypox {
 #endif
 	class Option : public OptionBase<T, N> {
 		const F m_validityChecker;
+
+		inline std::string_view typeName() const {
+			if constexpr(std::is_integral_v<T>)            return "I";
+			else if constexpr(std::is_floating_point_v<T>) return "D";
+			else /* T is text */                           return "T";
+		}
 	public:
 		Option(const std::string_view& name,
 			T& output,
@@ -309,20 +315,10 @@ namespace stypox {
 		}
 
 		std::string help(size_t descriptionIndentation) const override {
-			if constexpr(std::is_integral_v<T>)
-				return OptionBase<T, N>::help(descriptionIndentation, "I");
-			else if constexpr(std::is_floating_point_v<T>)
-				return OptionBase<T, N>::help(descriptionIndentation, "D");
-			else // text
-				return OptionBase<T, N>::help(descriptionIndentation, "T");
+			return OptionBase<T, N>::help(descriptionIndentation, typeName());
 		}
 		std::string usage() const override {
-			if constexpr(std::is_integral_v<T>)
-				return OptionBase<T, N>::usage("I");
-			else if constexpr(std::is_floating_point_v<T>)
-				return OptionBase<T, N>::usage("D");
-			else // text
-				return OptionBase<T, N>::usage("T");
+			return OptionBase<T, N>::usage(typeName());
 		}
 	};
 
