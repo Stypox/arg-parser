@@ -257,7 +257,8 @@ namespace stypox {
 			return argValue;
 	}
 
-	template<class T, size_t N, class F>
+	constexpr auto defaultOptionValidityChecker = [](auto){ return true; };
+	template<class T, size_t N, class F = decltype(defaultOptionValidityChecker)>
 	#if __cplusplus > 201703L || defined(__cpp_concepts)
 		requires requires (bool b, const F& f, const T& s) { b = f(s); }
 	#endif
@@ -275,7 +276,7 @@ namespace stypox {
 			const std::array<std::string_view, N>& arguments,
 			const std::string_view& help,
 			bool required = false,
-			const F& validityChecker = [](T){ return true; }) :
+			const F& validityChecker = defaultOptionValidityChecker) :
 			OptionBase<T, N>{name, output, arguments, help, required},
 			m_validityChecker{validityChecker} {}
 
