@@ -62,6 +62,21 @@ namespace stypox {
 			
 			return result;
 		}
+		std::string usage(const std::string_view& typeName) const {
+			std::string result;
+			if constexpr(N >= 1) {
+				result += ' ';
+				if(!m_required)
+					result += '[';
+
+				result.append(m_arguments[0]);
+				result.append(typeName);
+
+				if(!m_required)
+					result += ']';
+			}
+			return result;
+		}
 	public:
 		// @return true if @param arg is valid 
 		virtual bool assign(const std::string_view& arg) = 0;
@@ -75,6 +90,7 @@ namespace stypox {
 		}
 
 		virtual std::string help(size_t descriptionIndentation) const = 0;
+		virtual std::string usage() const = 0;
 	};
 
 	template<size_t N, class T = bool>
@@ -129,6 +145,9 @@ namespace stypox {
 		std::string help(size_t descriptionIndentation) const override {
 			return OptionBase<T, N>::help(descriptionIndentation, "");
 		}
+		std::string usage() const override {
+			return OptionBase<T, N>::usage("");
+		}
 	};
 
 	template<class T, size_t N, class F>
@@ -169,6 +188,9 @@ namespace stypox {
 
 		std::string help(size_t descriptionIndentation) const override {
 			return OptionBase<T, N>::help(descriptionIndentation, "S");
+		}
+		std::string usage() const override {
+			return OptionBase<T, N>::usage("S");
 		}
 	};
 
@@ -294,6 +316,14 @@ namespace stypox {
 			else // text
 				return OptionBase<T, N>::help(descriptionIndentation, "T");
 		}
+		std::string usage() const override {
+			if constexpr(std::is_integral_v<T>)
+				return OptionBase<T, N>::usage("I");
+			else if constexpr(std::is_floating_point_v<T>)
+				return OptionBase<T, N>::usage("D");
+			else // text
+				return OptionBase<T, N>::usage("T");
+		}
 	};
 
 	class HelpSection {
@@ -398,6 +428,15 @@ namespace stypox {
 				result.append(optionsHelp<I+1>());
 			return result;
 		}
+		template<size_t I = 0>
+		inline std::string optionsUsage() const {
+			std::string result;
+			if constexpr(!std::is_same_v<std::tuple_element_t<I, std::tuple<Options...>>, HelpSection>)
+				result = std::get<I>(m_options).usage();
+			if constexpr(I+1 != sizeof...(Options))
+				result.append(optionsUsage<I+1>());
+			return result;
+		}
 
 	public:
 		ArgParser(std::tuple<Options...> options,
@@ -488,16 +527,22 @@ namespace stypox {
 
 		std::string help() const {
 			std::string result{m_programName};
-			result.append(": Help screen\n\nUsage: ");
+			result.append(": Help screen\n");
+			result.append(usage());
+			result.append(optionsHelp());
+			result += '\n';
+			return result;
+		}
+		std::string usage() const {
+			std::string result = "Usage:";
 			if (m_executableName.has_value()) {
+				result += ' ';
 				result.append(*m_executableName);
-				result.append(" [OPTIONS...]\n\n");
-			}
-			else {
-				result.append("[OPTIONS...]\n\n");
 			}
 
-			return result + optionsHelp();
+			result.append(optionsUsage());
+			result += '\n';
+			return result;
 		}
 	};
 }
