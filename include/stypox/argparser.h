@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <tuple>
 #include <optional>
+#include <vector>
 
 namespace stypox {	
 	template<class... Args>
@@ -435,6 +436,43 @@ namespace stypox {
 		}
 		void parse(int argc, char const* argv[], bool firstArgumentIsExecutablePath = true) {
 			return parse(argv, argv+argc, firstArgumentIsExecutablePath);
+		}
+		
+		template<class Iter>
+	#if __cplusplus > 201703L || defined(__cpp_concepts)
+		requires std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string> ||
+			std::is_convertible_v<typename std::iterator_traits<Iter>::value_type, std::string_view>
+	#endif
+		std::vector<std::string> parsePositional(Iter first, const Iter& last, bool firstArgumentIsExecutablePath) {
+			if (firstArgumentIsExecutablePath) {
+				if (first == last)
+					throw std::out_of_range("stypox::ArgParser::parse(): too few items");
+				m_executableName = *first;
+				++first;
+			}
+			else {
+				m_executableName = std::nullopt;
+			}
+
+			std::vector<std::string> positionalArguments;
+			for(; first != last; ++first) {
+				m_doneAssigning = false;
+				if constexpr(std::is_same_v<typename std::iterator_traits<Iter>::value_type, std::string>) {
+					assign(first->c_str());
+					if(!m_doneAssigning)
+						positionalArguments.push_back(first);
+				}
+				else {
+					assign(*first);
+					if(!m_doneAssigning)
+						positionalArguments.push_back(std::string{std::string_view{*first}});
+				}
+			}
+
+			return positionalArguments;
+		}
+		std::vector<std::string> parsePositional(int argc, char const* argv[], bool firstArgumentIsExecutablePath = true) {
+			return parsePositional(argv, argv+argc, firstArgumentIsExecutablePath);
 		}
 
 		void validate() const {
