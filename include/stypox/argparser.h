@@ -35,7 +35,7 @@ namespace stypox {
 
 		void updateAlreadySeen(const std::string_view& arg) {
 			if (m_alreadySeen)
-				throw std::runtime_error("Option repeated multiple times: " + std::string{arg});
+				throw std::runtime_error("Option " + std::string{m_name} + " repeated multiple times: " + std::string{arg});
 			m_alreadySeen = true;
 		}
 
@@ -247,7 +247,7 @@ namespace stypox {
 					"\" is not a decimal: " + std::string{originalArg});
 			}
 			catch (std::out_of_range&) {
-				throw std::runtime_error("Option " + std::string{argName} + ": decimal \"" + std::string{argValue} +
+				throw std::runtime_error("Option " + std::string{argName} + ": out of range decimal \"" + std::string{argValue} +
 					"\" (must be between " + std::to_string(std::numeric_limits<T>::min()) + " and " +
 					std::to_string(std::numeric_limits<T>::max()) + "): " + std::string{originalArg});
 			}
