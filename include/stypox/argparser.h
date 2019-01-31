@@ -254,7 +254,7 @@ namespace stypox {
 		}
 
 		else // text
-			return argValue;
+			return T{argValue};
 	}
 
 	constexpr auto defaultOptionValidityChecker = [](auto){ return true; };
