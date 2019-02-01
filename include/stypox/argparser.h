@@ -475,7 +475,7 @@ namespace stypox {
 
 		std::string usage() const {
 			std::string result{m_programName};
-			result.append("\nLegend: I=integer; D=decimal; T=text; S=custom string;\nUsage:");
+			result.append("\nLegend: I=integer; D=decimal; T=text; S=custom string; *=required;\nUsage:");
 			if (m_executableName.has_value()) {
 				result += ' ';
 				result.append(*m_executableName);
