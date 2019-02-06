@@ -206,11 +206,13 @@ Other important options:
 
 Exit code: 0
 
+
 $./executable --usage; echo 'Exit code: '$?;
 Example program by Stypox
 Legend: I=integer; D=decimal; T=text; S=custom string; *=required;
 Usage: ./executable [-?] [-u] [--exit-with-error] [-c=D] -p=S
 Exit code: 0
+
 
 $./executable --cake=0.7245 --person="John Smith;17" --exit-with-error; echo 'Exit code: '$?;
 Here is a piece of cake of size 0.7245!
@@ -230,6 +232,7 @@ terminate called after throwing an instance of 'std::runtime_error'
   what():  Option cake: value 1.200000 is not allowed
 Aborted
 Exit code: 134
+
 
 $ ./executable --cake=1.2e10000; echo 'Exit code: '$?;
 terminate called after throwing an instance of 'std::runtime_error'
