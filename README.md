@@ -187,7 +187,7 @@ $ ./executable; echo 'Exit code: '$?;
 terminate called after throwing an instance of 'std::runtime_error'
   what():  Option person is required
 Aborted
-Exit code = 134
+Exit code: 134
 
 
 $ ./executable --help; echo 'Exit code: '$?;
