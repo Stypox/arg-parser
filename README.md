@@ -43,7 +43,7 @@ During the validation process every computed option has to meet these requiremen
 The parsing process and the validation process are **separate**, so that even if an option is invalid no error is generated until the validation starts. This is useful, for example, to display the help screen when `--help` is provided, even if other options are invalid. Every error contains an **thorough description** about what caused it.
 
 ## **Help screen**
-See below for an example help screen.
+See [below](#output) for an example help screen.
  - Titles and lines of description can be added to the help screen by providing **help sections**.
  - The **intentation** of the description of sections can be changed. When the indentation is not enough a newline is added between the arguments and the description
  - The first argument is considered, by default, the **executable path**, but this can be manually changed. The executable path is used for the help screen.
@@ -64,16 +64,16 @@ Constructs the ArgParser object. `Options...` must be made only of `SwitchOption
 ### ArgParser::parse()
 (1) `void (Iter first, Iter last, bool firstArgumentIsExecutablePath)`  
 (2) `void (int argc, char const* argv[], bool firstArgumentIsExecutablePath = true)`  
-Parses all the arguments in range [first, last) (1) / [argv, argv+argc) (2), reports parsing errors (by throwing `std::runtime_error`) as described above, saves the new values for options. Throws `std::out_of_range` if `firstArgumentIsExecutablePath` is set to `true` but the list of arguments is empty.
+Parses all the arguments in range [first, last) (1) / [argv, argv+argc) (2), reports parsing errors (by throwing `std::runtime_error`) as described [above](#options), saves the new values for options. Throws `std::out_of_range` if `firstArgumentIsExecutablePath` is set to `true` but the list of arguments is empty.
 
 ### ArgParser::parsePositional()
 (1) `vector<string> (Iter first, Iter last, bool firstArgumentIsExecutablePath)`  
 (2) `vector<string> (int argc, char const* argv[], bool firstArgumentIsExecutablePath = true)`  
-Parses all the arguments in range [first, last) (1) / [argv, argv+argc) (2), reports parsing errors (by throwing `std::runtime_error`) as described above, saves the new values for options. Returns the arguments that didn't match any option. Throws `std::out_of_range` if `firstArgumentIsExecutablePath` is set to `true` but the list of arguments is empty.
+Parses all the arguments in range [first, last) (1) / [argv, argv+argc) (2), reports parsing errors (by throwing `std::runtime_error`) as described [above](#options), saves the new values for options. Returns the arguments that didn't match any option. Throws `std::out_of_range` if `firstArgumentIsExecutablePath` is set to `true` but the list of arguments is empty.
 
 ### ArgParser::validate()
 `void ()`  
-Reports logical errors (by throwing std::runtime_error) as described above.
+Reports logical errors (by throwing std::runtime_error) as described [above](#error-checking-and-reporting).
 
 ### ArgParser::reset()
 `void ()`  
@@ -81,15 +81,15 @@ Every argument is set as if it had never been encountered.
 
 ### ArgParser::usage()
 `string ()`  
-Returns the usage screen. See the output of the code below for an example.
+Returns the usage screen. See the [output of the code below](#output) for an example.
 
 ### ArgParser::help()
 `string ()`  
-Returns the help screen. The indentation of the description of options can be set in the constructor. See the output of the code below for an example.
+Returns the help screen. The indentation of the description of options can be set in the constructor. See the [output of the code below](#output) for an example.
 
 ## SwitchOption, Option, ManualOption, HelpSection
 `HelpSection`
-`SwitchOption`, `Option` and `ManualOption` are the classes that keep information about every option. The difference between them is explained above. The array of possible arguments (of size `N`) can be initialized using `stypox::args()`.  
+`SwitchOption`, `Option` and `ManualOption` are the classes that keep information about every option. The difference between them is explained [above](#options). The array of possible arguments (of size `N`) can be initialized using `stypox::args()`.  
 `HelpSection` is a class that holds a string of text to be printed in the help screen.
 
 ### args()
@@ -103,7 +103,7 @@ Builds an array of possible arguments using the provided `list` (needed for the 
 
 ### Option::Option()
 `(string_view name, T& output, array<string_view, N> arguments, string_view help, required = false, F validityChecker = [](){ return true; })`  
-`Option`'s constructor. When parsing the value will be saved in `output`. When validating `validityChecker` is called with `(output)` (it must return `bool`). See above to read about the valid types `T`.
+`Option`'s constructor. When parsing the value will be saved in `output`. When validating `validityChecker` is called with `(output)` (it must return `bool`). See [above](#options) to read about the valid types `T`.
 
 ### ManualOption::ManualOption()
 `(string_view name, T& output, array<string_view, N> arguments, string_view help, F assignerFunctor, required = false)`  
