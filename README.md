@@ -154,7 +154,7 @@ int main(int argc, char const* argv[]) {
 						// the type of the returned value matches the type of variable @person
 						return std::pair<std::string, float>{name, std::stoi(age)};
 					} catch (...) {
-						throw std::runtime_error{"Invalid point " + std::string{str}};
+						throw std::runtime_error{"Invalid person " + std::string{str}};
 					}
 				},
 				true /* option required */}
