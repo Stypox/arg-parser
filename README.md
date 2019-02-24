@@ -73,7 +73,7 @@ Parses all the arguments in range [first, last) (1) / [argv, argv+argc) (2), rep
 
 ### ArgParser::validate()
 `void ()`  
-Reports logical errors (by throwing std::runtime_error) as described [above](#error-checking-and-reporting).
+Reports logical errors (by throwing `std::runtime_error`) as described [above](#error-checking-and-reporting).
 
 ### ArgParser::reset()
 `void ()`  
@@ -99,15 +99,15 @@ Builds an array of possible arguments using the provided `list` (needed for the 
 ### SwitchOption::SwitchOption()
 (when T is bool) `(string_view name, T& output, array<string_view, N> arguments, string_view help, T valueWhenSet = true, required = false)`  
 (when T is not bool) `(string_view name, T& output, array<string_view, N> arguments, string_view help, T valueWhenSet, required = false)`  
-`SwitchOption`'s constructor. When parsing the value will be saved in `output`.
+`SwitchOption`'s constructor. When parsing, the value will be saved in `output`.
 
 ### Option::Option()
 `(string_view name, T& output, array<string_view, N> arguments, string_view help, required = false, F validityChecker = [](){ return true; })`  
-`Option`'s constructor. When parsing the value will be saved in `output`. When validating `validityChecker` is called with `(output)` (it must return `bool`). See [above](#options) to read about the valid types `T`.
+`Option`'s constructor. When parsing, the value will be saved in `output`. When validating `validityChecker` is called with `(output)` (it must return `bool`). See [above](#options) to read about the valid types `T`.
 
 ### ManualOption::ManualOption()
 `(string_view name, T& output, array<string_view, N> arguments, string_view help, F assignerFunctor, required = false)`  
-`Option`'s constructor. When parsing the value, converted to `T` by calling `assignerFunction(string_view)`, will be saved in `output`.
+`Option`'s constructor. When parsing, the value, converted to `T` by calling `assignerFunctor(string_view)`, will be saved in `output`.
 
 ### HelpSection::HelpSection()
 `(string_view title)`  
