@@ -49,7 +49,7 @@ See [below](#output) for an example help screen.
  - The first argument is considered, by default, the **executable path**, but this can be manually changed. The executable path is used for the help screen.
 
 # Installation
-Just **download** the header file `argparser.h` and **`#include`** it into your project! If you want to `#include` it as `<stypox/argparser.h>` you need to add `-IPATH/TO/arg-parser/include` to your compiler options.  
+Just **download** the header file `argparser.hpp` and **`#include`** it into your project! If you want to `#include` it as `<stypox/argparser.hpp>` you need to add `-IPATH/TO/arg-parser/include` to your compiler options.  
 Note: it requires C++17, so add to your compiler options `-std=c++17`. C++20 is also supported, along with `requires` clauses.
 
 # Documentation
@@ -116,7 +116,7 @@ Builds an array of possible arguments using the provided `list` (needed for the 
 
 # Example
 ```cpp#include <iostream>
-#include "arg-parser/include/stypox/argparser.h"
+#include "arg-parser/include/stypox/argparser.hpp"
 
 int main(int argc, char const* argv[]) {
 	// initialize variables with the default values
