@@ -1,5 +1,5 @@
-#ifndef _ARG_PARSER_ARGPARSER_H_
-#define _ARG_PARSER_ARGPARSER_H_
+#ifndef _STYPOX_ARGPARSER_HPP_
+#define _STYPOX_ARGPARSER_HPP_
 
 #include <string>
 #include <array>
