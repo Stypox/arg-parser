@@ -115,7 +115,8 @@ Builds an array of possible arguments using the provided `list` (needed for the 
 
 
 # Example
-```cpp#include <iostream>
+```cpp
+#include <iostream>
 #include "arg-parser/include/stypox/argparser.hpp"
 
 int main(int argc, char const* argv[]) {
@@ -182,7 +183,7 @@ int main(int argc, char const* argv[]) {
 ```
 ### Output
 Output for different commands (`; echo 'Exit code: '$?;` is only there to print the exit code):
-```
+```sh
 $ ./executable; echo 'Exit code: '$?;
 terminate called after throwing an instance of 'std::runtime_error'
   what():  Option person is required
