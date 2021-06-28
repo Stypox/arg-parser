@@ -124,7 +124,7 @@ namespace stypox {
 					const T& valueWhenSet,
 				#if __cplusplus > 201703L || defined(__cpp_concepts)
 					bool required = false)
-						requires !std::is_same_v<T, bool> :
+						requires (!std::is_same_v<T, bool>) :
 				#else
 					typename std::enable_if_t<!std::is_same_v<Dummy, bool>, bool> required = false) :
 				#endif
