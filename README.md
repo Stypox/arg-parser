@@ -107,7 +107,7 @@ Builds an array of possible arguments using the provided `list` (needed for the 
 
 ### ManualOption::ManualOption()
 `(string_view name, T& output, array<string_view, N> arguments, string_view help, F assignerFunctor, required = false)`  
-`Option`'s constructor. When parsing, the value, converted to `T` by calling `assignerFunctor(string_view)`, will be saved in `output`.
+`ManualOption`'s constructor. When parsing, the value, converted to `T` by calling `assignerFunctor(string_view)`, will be saved in `output`.
 
 ### HelpSection::HelpSection()
 `(string_view title)`  
