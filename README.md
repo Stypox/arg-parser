@@ -45,7 +45,7 @@ The parsing process and the validation process are **separate**, so that even if
 ## **Help screen**
 See [below](#output) for an example help screen.
  - Titles and lines of description can be added to the help screen by providing **help sections**.
- - The **intentation** of the description of sections can be changed. When the indentation is not enough a newline is added between the arguments and the description
+ - The **indentation** of the description of sections can be changed. When the indentation is not enough a newline is added between the arguments and the description
  - The first argument is considered, by default, the **executable path**, but this can be manually changed. The executable path is used for the help screen.
 
 # Installation
